@@ -1,0 +1,1267 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>UP02 Mecanismos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: cuaderno de taller — papel milimetrado, una unidad por pestaña, cada concepto con su "banco de pruebas" interactivo */
+:root{
+  --paper:#F2F5F8; --panel:#FFFFFF; --ink:#16212C; --muted:#586776; --line:#CBD5DE; --grid:rgba(47,93,138,.07);
+  --steel:#2F5D8A; --steel-soft:#E1EAF3; --signal:#D9590B; --signal-soft:#FBE7DA;
+  --ok:#22804F; --ok-soft:#DDF1E5; --bad:#B8322A; --bad-soft:#F7E0DE;
+  --gear-a:#F6C9A9; --gear-b:#BFD3E8; --gear-c:#DCE3EA;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E151C; --panel:#15202A; --ink:#E3EAF1; --muted:#97A6B4; --line:#2B3A48; --grid:rgba(127,178,229,.06);
+  --steel:#82B5E8; --steel-soft:#1B2D3F; --signal:#FF8B42; --signal-soft:#3A2416;
+  --ok:#5CCB8E; --ok-soft:#163327; --bad:#FF7A70; --bad-soft:#3B1C1A;
+  --gear-a:#7A4422; --gear-b:#2C4C6C; --gear-c:#2A3846; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E151C; --panel:#15202A; --ink:#E3EAF1; --muted:#97A6B4; --line:#2B3A48; --grid:rgba(127,178,229,.06);
+  --steel:#82B5E8; --steel-soft:#1B2D3F; --signal:#FF8B42; --signal-soft:#3A2416;
+  --ok:#5CCB8E; --ok-soft:#163327; --bad:#FF7A70; --bad-soft:#3B1C1A;
+  --gear-a:#7A4422; --gear-b:#2C4C6C; --gear-c:#2A3846; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--f-body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.05;margin:0}
+h2{font-size:2.4rem;font-weight:800;letter-spacing:.01em;text-transform:uppercase}
+h3{font-size:1.55rem;font-weight:600;letter-spacing:.02em}
+p{margin:0;max-width:68ch}
+a{color:var(--steel)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px;border-radius:4px}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--muted)}
+
+/* Cabecera */
+.top{padding-block:28px 14px}
+.top .eyebrow{font:600 .78rem/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.top h1{font-size:clamp(3rem,9vw,5.6rem);font-weight:800;text-transform:uppercase;letter-spacing:.005em;margin-top:6px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1 svg{width:.8em;height:.8em;flex:none}
+.top .row{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.top .lead{color:var(--muted);max-width:52ch}
+.btn{font:700 .92rem/1 var(--f-body);border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);padding:10px 14px;border-radius:6px;cursor:pointer}
+.btn:hover{background:var(--steel-soft)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{opacity:.9}
+.btn.small{padding:7px 10px;font-size:.85rem}
+
+/* Pestañas */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:2px solid var(--ink)}
+.tabs .scroller{overflow-x:auto;scrollbar-width:thin}
+.tabs ol{list-style:none;display:flex;gap:0;margin:0;padding:0;min-width:max-content}
+.tabs button{font:600 1.15rem/1 var(--f-display);letter-spacing:.04em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:14px 14px 12px;cursor:pointer;border-bottom:4px solid transparent;display:flex;gap:8px;align-items:baseline}
+.tabs button small{font:600 .7rem/1 var(--f-mono);letter-spacing:0;color:var(--muted)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--signal)}
+
+/* Páginas */
+main{padding-block:28px 60px}
+.page{display:flex;flex-direction:column;gap:34px}
+.page-head{display:flex;flex-direction:column;gap:10px}
+.page-head .kicker{font:600 .78rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--signal)}
+.page-head p{font-size:1.08rem}
+.block{display:flex;flex-direction:column;gap:14px}
+.block > h3{border-top:1.5px solid var(--line);padding-top:16px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.cols > *{min-width:0}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px}
+.cols3 > *{min-width:0}
+
+.card{background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h4{margin:0;font:700 1.02rem/1.25 var(--f-body)}
+.card p{font-size:.97rem}
+.tag{display:inline-block;font:600 .72rem/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:4px;background:var(--steel-soft);color:var(--steel);align-self:flex-start}
+.tag.sig{background:var(--signal-soft);color:var(--signal)}
+
+/* Banco de pruebas */
+.lab{background:var(--panel);border:2px solid var(--ink);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+@media (max-width:820px){.lab{grid-template-columns:minmax(0,1fr)}}
+.lab .stage{position:relative;border-right:1.5px solid var(--line);min-width:0;display:flex;flex-direction:column}
+@media (max-width:820px){.lab .stage{border-right:0;border-bottom:1.5px solid var(--line)}}
+.lab .stage canvas{width:100%;height:300px;display:block;touch-action:none}
+.lab .stage .cap{font:400 .78rem/1.3 var(--f-mono);color:var(--muted);padding:8px 12px;border-top:1px dashed var(--line)}
+.lab .ctrl{padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.lab-title{display:flex;align-items:center;gap:10px;font:600 .75rem/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--signal)}
+.lab-title::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--signal)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:600 .85rem/1 var(--f-body);border:1.5px solid var(--line);background:var(--paper);color:var(--ink);padding:8px 10px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.field{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.field label{font-size:.92rem;font-weight:700}
+.field output,.field .val{font:600 .95rem/1 var(--f-mono);font-variant-numeric:tabular-nums;color:var(--steel)}
+.field input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--signal)}
+.numrow{display:flex;flex-wrap:wrap;gap:10px}
+.num{display:flex;flex-direction:column;gap:4px;min-width:0}
+.num label{font-size:.82rem;font-weight:700;color:var(--muted)}
+.num input,.num select{font:600 1rem/1 var(--f-mono);width:6.5em;padding:8px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.readout{border-top:1.5px solid var(--line);padding-top:12px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.readout dt{font-size:.85rem;color:var(--muted)}
+.readout dd{margin:0;font:600 1.05rem/1.2 var(--f-mono);font-variant-numeric:tabular-nums}
+.big{font:800 2rem/1 var(--f-display)!important;letter-spacing:.02em}
+.pill{display:inline-block;font:700 .78rem/1 var(--f-body);padding:5px 9px;border-radius:999px;letter-spacing:.02em}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.st{background:var(--steel-soft);color:var(--steel)}
+.pill.sg{background:var(--signal-soft);color:var(--signal)}
+
+/* Fórmulas */
+.formula{font:600 1.25rem/1.3 var(--f-mono);background:var(--steel-soft);color:var(--ink);border-left:4px solid var(--steel);padding:12px 16px;border-radius:0 8px 8px 0;overflow-x:auto;white-space:nowrap}
+.formula .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em}
+.formula .frac > span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
+.formula small{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:12px;white-space:normal}
+.where{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:.95rem}
+.where b{font-family:var(--f-mono)}
+.note{border:1.5px dashed var(--signal);background:var(--signal-soft);border-radius:8px;padding:12px 14px;font-size:.97rem}
+.note b{color:var(--signal)}
+.example{font-size:.95rem;background:var(--paper);border-radius:8px;padding:10px 12px;border:1px solid var(--line)}
+.example .mono{font-weight:600}
+
+/* Mini calculadoras */
+.calc{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.calc .res{font:700 1.15rem/1 var(--f-mono);color:var(--signal);padding-bottom:9px}
+
+/* Animaciones pequeñas */
+.mini canvas{width:100%;height:120px;display:block;background:var(--paper);border-radius:8px;border:1px solid var(--line)}
+
+/* Tabla */
+.tablewrap{overflow-x:auto;border:1.5px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.93rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 .74rem/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--paper)}
+tr:last-child td{border-bottom:0}
+
+/* Juego clasificar */
+.sort{display:flex;flex-direction:column;gap:8px}
+.sort .item{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--panel);border:1.5px solid var(--line);border-radius:8px}
+.sort .item.right{border-color:var(--ok);background:var(--ok-soft)}
+.sort .item.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.sort .item b{font-weight:700}
+.sort .opts{display:flex;gap:6px;flex-wrap:wrap}
+.sort .opts button{font:600 .8rem/1 var(--f-body);padding:7px 9px;border-radius:6px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.sort .opts button:disabled{cursor:default;opacity:.55}
+.sort .opts button.picked{opacity:1;border-color:var(--ink)}
+.scorebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* Práctica */
+.practice{background:var(--panel);border:1.5px solid var(--steel);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.practice .stmt{font-size:1.02rem;background:var(--paper);border-radius:8px;padding:12px 14px;border:1px solid var(--line)}
+.practice .answer{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.practice input{font:600 1.05rem/1 var(--f-mono);width:8em;padding:9px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.practice .sol{font-size:.95rem;border-left:3px solid var(--line);padding-left:12px}
+.practice .sol .mono{display:block;margin-top:4px}
+
+/* details */
+details.solved{background:var(--panel);border:1.5px solid var(--line);border-radius:10px}
+details.solved summary{cursor:pointer;padding:12px 14px;font-weight:700;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.solved summary::-webkit-details-marker{display:none}
+details.solved summary::before{content:"+";font:700 1.1rem/1 var(--f-mono);color:var(--signal);width:1ch}
+details.solved[open] summary::before{content:"−"}
+details.solved .body{padding:0 14px 14px 34px;display:flex;flex-direction:column;gap:6px}
+
+/* Quiz */
+.quiz{display:flex;flex-direction:column;gap:12px}
+.q{background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.q.right{border-color:var(--ok)}
+.q.wrong{border-color:var(--bad)}
+.q .qt{font-weight:700}
+.q .qn{font:600 .75rem/1 var(--f-mono);color:var(--muted)}
+.q label{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-radius:6px;cursor:pointer}
+.q label:hover{background:var(--paper)}
+.q input{accent-color:var(--signal);margin-top:5px}
+.q .exp{font-size:.92rem;color:var(--muted)}
+
+.svgfig{width:100%;height:auto;display:block}
+.sv-line{stroke:var(--ink);stroke-width:2.5;fill:none;stroke-linecap:round}
+.sv-thin{stroke:var(--muted);stroke-width:1.5;fill:none}
+.sv-ful{fill:var(--steel)}
+.sv-load{fill:var(--gear-b);stroke:var(--ink);stroke-width:1.5}
+.sv-wheel{fill:var(--gear-c);stroke:var(--ink);stroke-width:2}
+.sv-f{stroke:var(--signal);stroke-width:3;fill:none}
+.sv-fh{fill:var(--signal)}
+.sv-t{fill:var(--ink);font:700 13px var(--f-mono)}
+.sv-tm{fill:var(--muted);font:400 11px var(--f-body)}
+
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:16px}
+footer{padding-block:20px 40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+@media (max-width:520px){h2{font-size:2rem} body{font-size:16px} .lab .stage canvas{height:250px}}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+.num select{width:auto;min-width:6.5em}
+
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}
+.fig{margin:0;display:flex;flex-direction:column;gap:5px;min-width:0}
+.fig img,.fig video{width:100%;height:170px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px;display:block}
+.fig video{cursor:pointer}
+.fig figcaption{font-size:.8rem;line-height:1.3;color:var(--muted)}
+.sumtable{min-width:0}
+.sumtable td:first-child{font-weight:400;width:45%}
+:root{--t1:#FDF0D8;--t2:#F8D5F2;--t3:#E8F2C4;--t4:#C9E0EE;--t5:#E3E3E3}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--t1:#3A2E17;--t2:#3B2338;--t3:#2D3517;--t4:#1C3240;--t5:#2C2F33}}
+:root[data-theme="dark"]{--t1:#3A2E17;--t2:#3B2338;--t3:#2D3517;--t4:#1C3240;--t5:#2C2F33}
+.sumtable .r1 td{background:var(--t1)}.sumtable .r2 td{background:var(--t2)}.sumtable .r3 td{background:var(--t3)}.sumtable .r4 td{background:var(--t4)}.sumtable .r5 td{background:var(--t5)}
+.sumtable td{vertical-align:middle;line-height:1.55}
+.sortgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:14px}
+.scard{background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.scard.right{border-color:var(--ok);background:var(--ok-soft)}
+.scard.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.sthumb{height:120px;background:#fff;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sthumb img{max-height:110px;max-width:100%;object-fit:contain}
+.sthumb svg{height:100px;width:auto}
+.sname{font-size:1rem}
+.scard .opts{display:flex;flex-direction:column;gap:5px}
+.scard .opts button{font:600 .82rem/1.2 var(--f-body);text-align:left;padding:7px 9px;border-radius:6px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.scard .opts button:hover:not(:disabled){border-color:var(--ink)}
+.scard .opts button:disabled{cursor:default;opacity:.5}
+.scard .opts button.picked{opacity:1;border-color:var(--ink)}
+.sfb{font-weight:700;font-size:.88rem;min-height:1.2em}
+.scard.right .sfb{color:var(--ok)}.scard.wrong .sfb{color:var(--bad)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">2º ESO · Tecnología · UP02 · IES Marco Fabio Quintiliano</div>
+    <div class="row">
+      <h1><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4"><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="3.5"/></g><g fill="currentColor"><rect x="17" y="2" width="6" height="7"/><rect x="17" y="31" width="6" height="7"/><rect x="2" y="17" width="7" height="6"/><rect x="31" y="17" width="7" height="6"/><rect x="17" y="2" width="6" height="7" transform="rotate(45 20 20)"/><rect x="17" y="31" width="6" height="7" transform="rotate(45 20 20)"/><rect x="2" y="17" width="7" height="6" transform="rotate(45 20 20)"/><rect x="31" y="17" width="7" height="6" transform="rotate(45 20 20)"/></g></svg>Mecanismos</h1>
+      <button class="btn small" id="pauseBtn" type="button" aria-pressed="false">Pausar animaciones</button>
+    </div>
+    <p class="lead">Elementos básicos de máquinas: cómo se transmite y se transforma el movimiento. Mueve los deslizadores de cada banco de pruebas y comprueba las fórmulas.</p>
+  </header>
+</div>
+
+<nav class="tabs" aria-label="Apartados de la unidad">
+  <div class="wrap scroller">
+    <ol>
+      <li><button type="button" data-p="intro"><small>1</small>Introducción</button></li>
+      <li><button type="button" data-p="lineal"><small>2</small>Transmisión lineal</button></li>
+      <li><button type="button" data-p="circular"><small>3</small>Transmisión circular</button></li>
+      <li><button type="button" data-p="relacion"><small>3.1</small>Relación de transmisión</button></li>
+      <li><button type="button" data-p="trenes"><small>3.2</small>Trenes de engranajes</button></li>
+      <li><button type="button" data-p="transformacion"><small>4</small>Transformación</button></li>
+      <li><button type="button" data-p="reto"><small>★</small>Reto</button></li>
+      <li><button type="button" data-p="repaso"><small>✓</small>Repaso</button></li>
+    </ol>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ 1. INTRODUCCIÓN ============ -->
+<section class="page" id="intro" data-title="Introducción">
+  <div class="page-head">
+    <span class="kicker">Apartado 1 · Mecanismos y movimientos</span>
+    <h2>¿Qué es un mecanismo?</h2>
+    <p>Un mecanismo es un <b>conjunto de piezas que transmiten o transforman un movimiento</b>. Al contrario que las estructuras, que se diseñan para aguantar cargas sin deformarse, los mecanismos están pensados precisamente para que unos elementos puedan desplazarse respecto a otros.</p>
+  </div>
+
+  <div class="lab">
+    <div class="stage">
+      <canvas id="cvStruct" aria-label="Estructura triangular fija y mecanismo de cuatro barras deformable"></canvas>
+      <div class="cap">Arrastra el punto rojo de cada construcción.</div>
+    </div>
+    <div class="ctrl">
+      <div class="lab-title">Banco de pruebas</div>
+      <h4 style="margin:0;font-size:1.05rem">Estructura frente a mecanismo</h4>
+      <p>A la izquierda, un triángulo de barras: sus elementos son inamovibles. A la derecha, un cuadrilátero articulado: al mover el punto rojo, la construcción se deforma.</p>
+      <p id="structMsg" class="muted">Prueba primero con el triángulo.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <p>Piensa en tu <b>bicicleta</b>: transforma el movimiento de tus piernas (<b>movimiento de entrada</b>) en el movimiento de las ruedas (<b>movimiento de salida</b>). Así nos desplazamos a gran velocidad sin demasiado esfuerzo. Los movimientos de entrada y salida pueden ser de diferentes tipos.</p>
+  </div>
+
+  <div class="block">
+    <h3>Tipos de movimiento</h3>
+    <div class="cols">
+      <div class="card mini">
+        <span class="tag">Lineal o rectilíneo</span>
+        <canvas id="cvMovLin" aria-label="Animación de movimiento lineal"></canvas>
+        <p>La trayectoria del cuerpo es una <b>recta</b>. Se mueve con una <b>velocidad lineal</b>:</p>
+        <div class="formula">v = <span class="frac"><span>d</span><span>t</span></span><small>v velocidad · d distancia · t tiempo</small></div>
+        <p class="muted" style="font-size:.9rem">Lo más correcto es usar metros y segundos (m/s). Con kilómetros y horas se obtiene km/h.</p>
+        <div class="calc">
+          <div class="num"><label for="cDist">d (m)</label><input id="cDist" type="number" value="18" step="any"></div>
+          <div class="num"><label for="cTime">t (s)</label><input id="cTime" type="number" value="2" step="any" min="0"></div>
+          <div class="res" id="cVel">9 m/s</div>
+        </div>
+        <p class="example">Ejemplo: un coche tarda 2 s en recorrer 18 m en línea recta → <span class="mono">v = 18 / 2 = 9 m/s</span></p>
+      </div>
+      <div class="card mini">
+        <span class="tag">Circular</span>
+        <canvas id="cvMovCir" aria-label="Animación de movimiento circular"></canvas>
+        <p>La trayectoria es una <b>circunferencia</b> de cierto radio. Si el radio es nulo, el cuerpo gira sobre sí mismo (como la Tierra: traslación y rotación). Su velocidad es la <b>velocidad angular</b>:</p>
+        <div class="formula">n = <span class="frac"><span>nº de vueltas</span><span>t</span></span><small>en tecnología, t en minutos → rpm</small></div>
+        <div class="calc">
+          <div class="num"><label for="cTurns">vueltas</label><input id="cTurns" type="number" value="12" step="any"></div>
+          <div class="num"><label for="cMin">t (min)</label><input id="cMin" type="number" value="3" step="any" min="0"></div>
+          <div class="res" id="cRpm">4 rpm</div>
+        </div>
+        <p class="example">Ejemplo: un tiovivo da 12 vueltas cada 3 minutos → <span class="mono">n = 12 / 3 = 4 rpm</span></p>
+      </div>
+      <div class="card mini">
+        <span class="tag">Lineal alternativo</span>
+        <canvas id="cvMovLinAlt" aria-label="Animación de movimiento lineal alternativo"></canvas>
+        <p>Una variante del movimiento lineal: un <b>movimiento lineal oscilante</b>, de ida y vuelta. Tiene muchísimas aplicaciones, como verás en el tema (pistones, sierras de calar, máquinas de coser…).</p>
+      </div>
+      <div class="card mini">
+        <span class="tag">Circular alternativo</span>
+        <canvas id="cvMovCirAlt" aria-label="Animación de un péndulo"></canvas>
+        <p>El movimiento circular también puede ser oscilante. El ejemplo más conocido es el de un <b>péndulo</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Clasificación de los mecanismos</h3>
+    <p>Los mecanismos se clasifican según sus movimientos de entrada y de salida:</p>
+    <div class="cols3">
+      <div class="card"><span class="tag">Transmisión lineal</span><p>Entrada <b>lineal</b> → salida <b>lineal</b>.</p><p class="muted">Palanca, polea, plano inclinado.</p></div>
+      <div class="card"><span class="tag">Transmisión circular</span><p>Entrada <b>circular</b> → salida <b>circular</b>.</p><p class="muted">Engranajes, poleas con correa, ruedas de fricción, piñón-cadena, tornillo sin fin.</p></div>
+      <div class="card"><span class="tag sig">Transformación</span><p>Entrada y salida <b>distintas</b> (circular ↔ lineal).</p><p class="muted">Piñón-cremallera, tornillo-tuerca, biela-manivela, leva, yugo escocés.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Tabla resumen de los tipos de mecanismos y sus nombres</h3>
+    <div class="tablewrap"><table class="sumtable">
+      <thead><tr><th>Tipo</th><th>Mecanismo</th></tr></thead>
+      <tbody>
+        <tr class="r1"><td>Transmisión lineal</td><td>Plano inclinado<br>Poleas<br>Palanca</td></tr>
+        <tr class="r2"><td>Transmisión circular</td><td>Engranajes y trenes<br>Poleas con correa<br>Engranajes con cadena o con correa dentada<br>Rueda de fricción<br>Tornillo sin fin</td></tr>
+        <tr class="r3"><td>Transformación de movimiento circular en <b>movimiento lineal</b></td><td>Tornillo-tuerca<br>Piñón-cremallera</td></tr>
+        <tr class="r4"><td>Transformación de movimiento circular en <b>movimiento lineal alternativo</b></td><td>Biela-manivela<br>Excéntrica-manivela<br>Leva-seguidor<br>Yugo escocés</td></tr>
+        <tr class="r5"><td>Otros</td><td>Cruz de Malta</td></tr>
+      </tbody></table></div>
+    <p>¿Te la sabes? Ponte a prueba en el apartado <a href="#reto" data-go="reto">Reto: clasifica los mecanismos</a>.</p>
+  </div>
+
+  <div class="pager"><span></span><button class="btn primary" data-go="lineal" type="button">Siguiente: Transmisión lineal →</button></div>
+</section>
+
+<!-- ============ 2. TRANSMISIÓN LINEAL ============ -->
+<section class="page" id="lineal" data-title="Transmisión lineal" hidden>
+  <div class="page-head">
+    <span class="kicker">Apartado 2 · Mecanismos de transmisión</span>
+    <h2>Transmisión lineal</h2>
+    <p>Mecanismos que reciben un movimiento lineal y entregan otro movimiento lineal: el plano inclinado, las poleas y la palanca.</p>
+  </div>
+
+  <div class="block">
+    <h3>El plano inclinado</h3>
+    <div class="cols">
+      <p>Aunque es muy simple, el plano inclinado es un mecanismo de transmisión lineal: transmite el movimiento lineal del brazo de la persona que empuja la caja en otro movimiento lineal, el de la propia caja. Nos permite <b>elevar un objeto con menor esfuerzo</b>, a costa de <b>aumentar la distancia</b> que tenemos que desplazarlo.</p>
+      <svg class="svgfig" viewBox="0 0 320 130" role="img" aria-label="Caja subiendo por un plano inclinado">
+        <polygon points="20,115 290,115 290,35" fill="var(--gear-c)" stroke="var(--ink)" stroke-width="2"/>
+        <g transform="translate(150 75) rotate(-16.5)"><rect x="-22" y="-34" width="44" height="34" class="sv-load"/><text x="0" y="-12" text-anchor="middle" class="sv-t">R</text></g>
+        <line x1="70" y1="104" x2="122" y2="88" class="sv-f"/><polygon points="128,86 117,84 121,94" class="sv-fh"/>
+        <text x="60" y="96" class="sv-t" fill="var(--signal)">F</text>
+        <line x1="300" y1="35" x2="300" y2="115" class="sv-thin" stroke-dasharray="4 3"/><text x="304" y="80" class="sv-tm">h</text>
+        <text x="150" y="128" class="sv-tm" text-anchor="middle">longitud del plano, mayor que h</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Las poleas</h3>
+    <p>Una polea es una rueda que gira alrededor de un eje y tiene un canal por el que pasa una cuerda o correa. Su objetivo principal es <b>reducir el esfuerzo</b> obteniendo ventaja mecánica, aunque también sirven para <b>cambiar la dirección de la fuerza</b>.</p>
+    <div class="cols3">
+      <div class="card">
+        <span class="tag">Polea fija</span>
+        <svg class="svgfig" viewBox="0 0 160 150" role="img" aria-label="Polea fija">
+          <line x1="20" y1="8" x2="140" y2="8" class="sv-line"/><line x1="80" y1="8" x2="80" y2="30" class="sv-line"/>
+          <circle cx="80" cy="40" r="18" class="sv-wheel"/><circle cx="80" cy="40" r="3" fill="var(--ink)"/>
+          <line x1="62" y1="40" x2="62" y2="100" class="sv-line"/><line x1="98" y1="40" x2="98" y2="105" class="sv-line"/>
+          <rect x="47" y="100" width="30" height="26" class="sv-load"/><text x="62" y="118" text-anchor="middle" class="sv-t">R</text>
+          <line x1="98" y1="105" x2="98" y2="132" class="sv-f"/><polygon points="98,142 92,130 104,130" class="sv-fh"/><text x="108" y="128" class="sv-t" fill="var(--signal)">F</text>
+        </svg>
+        <div class="formula">F = R</div>
+        <p>No reduce el esfuerzo: solo cambia la dirección de la fuerza (tiramos hacia abajo para subir la carga).</p>
+      </div>
+      <div class="card">
+        <span class="tag">Polea móvil</span>
+        <svg class="svgfig" viewBox="0 0 160 150" role="img" aria-label="Polea móvil">
+          <line x1="20" y1="8" x2="140" y2="8" class="sv-line"/>
+          <line x1="58" y1="8" x2="58" y2="80" class="sv-line"/><line x1="102" y1="80" x2="102" y2="35" class="sv-line"/>
+          <circle cx="80" cy="80" r="22" class="sv-wheel"/><circle cx="80" cy="80" r="3" fill="var(--ink)"/>
+          <line x1="80" y1="80" x2="80" y2="112" class="sv-line"/>
+          <rect x="65" y="112" width="30" height="26" class="sv-load"/><text x="80" y="130" text-anchor="middle" class="sv-t">R</text>
+          <line x1="102" y1="45" x2="102" y2="24" class="sv-f"/><polygon points="102,14 96,26 108,26" class="sv-fh"/><text x="111" y="32" class="sv-t" fill="var(--signal)">F</text>
+        </svg>
+        <div class="formula">F = <span class="frac"><span>R</span><span>2</span></span></div>
+        <p>La carga cuelga de dos tramos de cuerda, así que el esfuerzo se reduce a la mitad.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Polea compuesta (polipasto)</span>
+        <svg class="svgfig" viewBox="0 0 160 150" role="img" aria-label="Polipasto con una polea fija y una móvil">
+          <line x1="20" y1="8" x2="140" y2="8" class="sv-line"/><line x1="94" y1="8" x2="94" y2="22" class="sv-line"/>
+          <circle cx="94" cy="34" r="14" class="sv-wheel"/>
+          <line x1="50" y1="8" x2="50" y2="88" class="sv-line"/>
+          <line x1="80" y1="34" x2="80" y2="88" class="sv-line"/>
+          <circle cx="65" cy="88" r="15" class="sv-wheel"/>
+          <line x1="65" y1="88" x2="65" y2="112" class="sv-line"/>
+          <rect x="50" y="112" width="30" height="26" class="sv-load"/><text x="65" y="130" text-anchor="middle" class="sv-t">R</text>
+          <line x1="108" y1="34" x2="108" y2="96" class="sv-line"/>
+          <line x1="108" y1="96" x2="108" y2="122" class="sv-f"/><polygon points="108,132 102,120 114,120" class="sv-fh"/><text x="117" y="118" class="sv-t" fill="var(--signal)">F</text>
+        </svg>
+        <div class="formula">F = <span class="frac"><span>R</span><span>2·n</span></span><small>n = nº de poleas móviles</small></div>
+        <p>Combina poleas fijas y móviles: reduce el esfuerzo y además permite tirar hacia abajo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>La palanca y su ley</h3>
+    <p>La palanca es probablemente el mecanismo de transmisión lineal más conocido. La forman la <b>potencia (P)</b>, la <b>resistencia (R)</b> y el <b>punto de apoyo o fulcro</b>. Se usa sobre todo para elevar pesos, aunque unas pinzas, unas tijeras o una caña de pescar también son palancas.</p>
+    <div class="formula">P · b<sub>p</sub> = R · b<sub>r</sub><small>P potencia · b<sub>p</sub> brazo de la potencia · R resistencia · b<sub>r</sub> brazo de la resistencia</small></div>
+    <p>Una palanca está en <b>equilibrio</b> cuando la potencia por su brazo es igual a la resistencia por el suyo: entonces no se desplaza en ningún sentido. Si la igualdad no se cumple, la palanca empieza a moverse:</p>
+    <div class="cols">
+      <div class="example"><b>a)</b> hacia el lado de la potencia si <span class="mono">P · b<sub>p</sub> &gt; R · b<sub>r</sub></span></div>
+      <div class="example"><b>b)</b> hacia el lado de la resistencia si <span class="mono">P · b<sub>p</sub> &lt; R · b<sub>r</sub></span></div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="stage">
+      <canvas id="cvLever" aria-label="Simulador de palanca"></canvas>
+      <div class="cap">P en naranja, R en azul. Las distancias están dibujadas a escala.</div>
+    </div>
+    <div class="ctrl">
+      <div class="lab-title">Simulador de palanca</div>
+      <div class="seg" id="leverGrade" role="group" aria-label="Tipo de palanca">
+        <button type="button" data-g="1" aria-pressed="true">1er grado</button>
+        <button type="button" data-g="2" aria-pressed="false">2º grado</button>
+        <button type="button" data-g="3" aria-pressed="false">3er grado</button>
+      </div>
+      <div class="field"><label for="lvP">Potencia P</label><output id="lvPo">50 N</output><input id="lvP" type="range" min="10" max="300" step="5" value="50"></div>
+      <div class="field"><label for="lvBp">Brazo de potencia b<sub>p</sub></label><output id="lvBpo">2 m</output><input id="lvBp" type="range" min="0.5" max="4" step="0.25" value="2"></div>
+      <div class="field"><label for="lvR">Resistencia R</label><output id="lvRo">100 N</output><input id="lvR" type="range" min="10" max="300" step="5" value="100"></div>
+      <div class="field"><label for="lvBr">Brazo de resistencia b<sub>r</sub></label><output id="lvBro">1 m</output><input id="lvBr" type="range" min="0.5" max="4" step="0.25" value="1"></div>
+      <dl class="readout">
+        <dt>P · b<sub>p</sub></dt><dd id="lvMp">100 N·m</dd>
+        <dt>R · b<sub>r</sub></dt><dd id="lvMr">100 N·m</dd>
+        <dt>Estado</dt><dd id="lvState"></dd>
+      </dl>
+      <p id="lvHint" class="muted" style="font-size:.9rem"></p>
+      <button class="btn small" id="lvReset" type="button" style="align-self:flex-start">Volver a poner horizontal</button>
+    </div>
+  </div>
+
+  <div class="note"><b>¡Muy importante!</b> La palanca permanece quieta cuando está en equilibrio, pero <b>no tiene por qué estar horizontal</b>. Su posición depende de cómo estaba cuando se alcanzó el equilibrio. Compruébalo en el simulador: desequilibra la palanca, deja que se incline y después iguala los momentos.</div>
+
+  <div class="block">
+    <h3>Tipos de palancas</h3>
+    <div class="cols3" id="leverTypes"></div>
+  </div>
+
+  <div class="block">
+    <h3>Practica la ley de la palanca</h3>
+    <div class="practice" data-gens="palanca"></div>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="intro" type="button">← Introducción</button><button class="btn primary" data-go="circular" type="button">Siguiente: Transmisión circular →</button></div>
+</section>
+
+<!-- ============ 3. TRANSMISIÓN CIRCULAR ============ -->
+<section class="page" id="circular" data-title="Transmisión circular" hidden>
+  <div class="page-head">
+    <span class="kicker">Apartado 3 · Mecanismos de transmisión</span>
+    <h2>Transmisión circular</h2>
+    <p>Transmiten el movimiento, la fuerza y la potencia de forma circular desde el <b>elemento motriz</b> hasta los receptores: engranajes, poleas con correa, ruedas de fricción, piñón-cadena y tornillo sin fin.</p>
+  </div>
+
+  <div class="lab" id="circLab">
+    <div class="stage">
+      <canvas id="cvCirc" aria-label="Simulador de mecanismos de transmisión circular"></canvas>
+      <div class="cap">Animación ralentizada. La rueda naranja es la motriz (1), la azul es la conducida (2).</div>
+    </div>
+    <div class="ctrl">
+      <div class="lab-title">Banco de transmisión circular</div>
+      <div class="seg" id="circMech" role="group" aria-label="Mecanismo">
+        <button type="button" data-m="eng" aria-pressed="true">Engranajes</button>
+        <button type="button" data-m="pol" aria-pressed="false">Poleas y correa</button>
+        <button type="button" data-m="cru" aria-pressed="false">Correa cruzada</button>
+        <button type="button" data-m="fri" aria-pressed="false">Fricción</button>
+        <button type="button" data-m="cad" aria-pressed="false">Piñón-cadena</button>
+        <button type="button" data-m="sin" aria-pressed="false">Sin fin</button>
+      </div>
+      <div class="field" id="circAWrap"><label for="circA" id="circAl">Z₁ (motriz)</label><output id="circAo"></output><input id="circA" type="range" min="8" max="60" step="1" value="12"></div>
+      <div class="field"><label for="circB" id="circBl">Z₂ (conducida)</label><output id="circBo"></output><input id="circB" type="range" min="8" max="60" step="1" value="36"></div>
+      <div class="numrow"><div class="num"><label for="circN1">n₁ (rpm)</label><input id="circN1" type="number" value="120" min="0" step="any"></div></div>
+      <div class="formula" id="circFormula" style="font-size:1rem"></div>
+      <dl class="readout">
+        <dt>n₂</dt><dd class="big" id="circN2"></dd>
+        <dt>i = n₂ / n₁</dt><dd id="circI"></dd>
+        <dt>Tipo</dt><dd id="circType"></dd>
+        <dt>Sentido</dt><dd id="circDir"></dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Engranajes</h3>
+    <p>Son el mecanismo de transmisión circular más empleado: ascensores, vehículos, lavadoras, centrales eléctricas, relojes… Transmiten el movimiento mediante ruedas con un número de dientes en su perímetro; según el número de dientes de cada rueda, la velocidad aumenta o disminuye. Se llama <b>engranaje al conjunto de dos ruedas dentadas</b>: una sola rueda no es un mecanismo.</p>
+    <div class="cols">
+      <div class="card"><span class="tag">Exteriores</span><p>Los más comunes. Transmiten el movimiento entre dos <b>ejes paralelos</b> separados. El <b>sentido de giro se invierte</b>: si uno gira como las agujas del reloj, el otro gira al revés.</p><div data-figs="p3_0:Engranajes exteriores|p3_1:Engranajes de 10 y 30 dientes vistos de frente"></div></div>
+      <div class="card"><span class="tag">Interiores</span><p>Para ejes paralelos <b>muy próximos</b>, una rueda gira dentro de otra con dientes por dentro. Se usan en mecanismos pequeños, como los relojes. Aquí las dos ruedas giran en el mismo sentido.</p><div data-figs="p3_2:Engranaje interior|p3_3:Engranaje interior en movimiento"></div></div>
+      <div class="card"><span class="tag">Cónicos</span><p>Transmiten el movimiento entre <b>ejes perpendiculares</b> (90°) u otros ángulos. Para un giro más suave a veces se tallan los dientes de forma <b>helicoidal</b> en vez de rectos.</p><div data-figs="p3_4:Engranajes perpendiculares cónicos|p3_5:Engranajes perpendiculares helicoidales|p3_6:Engranajes paralelos helicoidales"></div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Poleas con correa</h3>
+    <p>Dos ruedas con una acanaladura por la que pasa una correa. Conectan ejes (normalmente paralelos) <b>separados a cierta distancia</b>: basta elegir una correa de la longitud adecuada. Su desventaja: la correa <b>puede deslizar</b> si se transmiten fuerzas muy grandes. Las dos poleas giran en el <b>mismo sentido</b>, salvo si <b>cruzamos la correa</b>, que invierte el giro. En algunos motores, una única correa mueve un conjunto de poleas.</p>
+    <div data-figs="p3_9:Poleas con correa y correa de un motor|p3_10:Las dos poleas giran en el mismo sentido|p3_11:Con la correa cruzada, el giro se invierte"></div>
+  </div>
+
+  <div class="block">
+    <h3>Ruedas de fricción</h3>
+    <p>Transmiten el movimiento por el <b>rozamiento</b> entre dos ruedas. Se usan poco porque reúnen las desventajas de los otros dos: cuesta conectar ejes alejados (como en los engranajes) y pueden deslizar (como las poleas). El sentido de giro se invierte, aunque se puede intercalar una <b>rueda loca</b> para cambiarlo.</p>
+    <div data-figs="p3_12:Ruedas de fricción, sin y con rueda loca"></div>
+  </div>
+
+  <div class="block">
+    <h3>Piñón-cadena</h3>
+    <p>Une las ventajas de los engranajes y de las poleas: dos ruedas dentadas (<b>piñones</b>) sobre las que se engancha una <b>cadena de eslabones</b>. Conecta ejes bastante alejados y los dientes <b>evitan el deslizamiento</b>. Es el mecanismo de tu bicicleta.</p>
+    <div data-figs="p3_13:Piñón-cadena y la cadena de una bicicleta|p4_2:Engranajes con cadena|p4_3:Engranajes con correa dentada"></div>
+  </div>
+
+  <div class="block">
+    <h3>Tornillo sin fin y corona</h3>
+    <p>Transmite movimiento circular entre dos <b>ejes perpendiculares</b>. Consta de un <b>tornillo sin fin</b> (varilla con una ranura helicoidal o rosca) y una <b>rueda dentada o corona</b> que engrana con él. Por cada vuelta del tornillo la corona avanza <b>un solo diente</b>, así que la reducción de velocidad es enorme: con una corona de 50 dientes hacen falta 50 vueltas del tornillo para que la corona dé una vuelta. Se usa para grandes reducciones en poco espacio, por ejemplo para mover una cinta transportadora.</p>
+    <div data-figs="p3_14:Por cada vuelta del tornillo, la corona avanza un diente|p3_15:Tornillo sin fin con relación de transmisión 1:36|p3_16:Aplicación: mover una cinta transportadora"></div>
+    <div class="note"><b>Sistema irreversible:</b> la corona no puede hacer girar al tornillo. El movimiento solo pasa del tornillo a la corona.</div>
+  </div>
+
+  <div class="block">
+    <h3>Comparativa rápida</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Mecanismo</th><th>Ejes</th><th>Sentido de giro</th><th>Ventaja</th><th>Inconveniente</th></tr></thead>
+        <tbody>
+          <tr><td><b>Engranajes exteriores</b></td><td>Paralelos, cercanos</td><td>Se invierte</td><td>No deslizan, transmiten mucha fuerza</td><td>Ejes no pueden estar alejados</td></tr>
+          <tr><td><b>Poleas con correa</b></td><td>Paralelos, alejados</td><td>Igual (cruzada: se invierte)</td><td>Une ejes muy separados</td><td>La correa puede deslizar</td></tr>
+          <tr><td><b>Ruedas de fricción</b></td><td>Paralelos, cercanos</td><td>Se invierte</td><td>Muy sencillo</td><td>Desliza y no une ejes alejados</td></tr>
+          <tr><td><b>Piñón-cadena</b></td><td>Paralelos, alejados</td><td>Igual</td><td>Une ejes alejados sin deslizar</td><td>Necesita lubricación, más ruidoso</td></tr>
+          <tr><td><b>Tornillo sin fin</b></td><td>Perpendiculares</td><td>—</td><td>Reducción enorme en poco espacio</td><td>Irreversible</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Todos estos mecanismos tienen en común que su transmisión queda definida por la <b>relación de transmisión</b>.</p>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="lineal" type="button">← Transmisión lineal</button><button class="btn primary" data-go="relacion" type="button">Siguiente: Relación de transmisión →</button></div>
+</section>
+
+<!-- ============ 3.1 RELACIÓN DE TRANSMISIÓN ============ -->
+<section class="page" id="relacion" data-title="Relación de transmisión" hidden>
+  <div class="page-head">
+    <span class="kicker">Apartado 3.1 · Transmisión circular</span>
+    <h2>Relación de transmisión</h2>
+    <p>Todos los mecanismos de transmisión circular tienen un <b>elemento motor</b> (inicial o de entrada, subíndice 1), que arrastra al resto, y un <b>elemento conducido</b> (final o de salida, subíndice 2).</p>
+  </div>
+
+  <div class="block">
+    <p>La <b>relación de transmisión (i)</b> es la relación entre las vueltas que da el elemento conducido y las que da el elemento motor en el mismo tiempo, es decir, entre sus velocidades angulares en rpm:</p>
+    <div class="formula">i = <span class="frac"><span>n₂</span><span>n₁</span></span><small>n₂ velocidad de la conducida · n₁ velocidad de la motriz</small></div>
+    <div class="cols3">
+      <div class="card"><span class="pill sg" style="align-self:flex-start">i &gt; 1</span><h4>Multiplicador</h4><p>La rueda conducida gira más rápido que la motriz. También se llama amplificador.</p></div>
+      <div class="card"><span class="pill st" style="align-self:flex-start">i &lt; 1</span><h4>Reductor</h4><p>La velocidad final es menor que la inicial.</p></div>
+      <div class="card"><span class="pill ok" style="align-self:flex-start">i = 1</span><h4>Directo</h4><p>La velocidad no cambia: ni amplifica ni reduce.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Analogías entre mecanismos</h3>
+    <div class="cols3">
+      <div class="card">
+        <span class="tag">Engranajes · cadena</span>
+        <p>Cuando avanza un diente de la rueda motriz, avanza un diente de la conducida. Z es el número de dientes.</p>
+        <div class="formula" style="font-size:1.05rem">n₁ · Z₁ = n₂ · Z₂</div>
+        <div class="formula" style="font-size:1.05rem">i = <span class="frac"><span>n₂</span><span>n₁</span></span> = <span class="frac"><span>Z₁</span><span>Z₂</span></span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Poleas · fricción</span>
+        <p>Las dos ruedas recorren el mismo perímetro (π·D). D es el diámetro.</p>
+        <div class="formula" style="font-size:1.05rem">n₁ · D₁ = n₂ · D₂</div>
+        <div class="formula" style="font-size:1.05rem">i = <span class="frac"><span>n₂</span><span>n₁</span></span> = <span class="frac"><span>D₁</span><span>D₂</span></span></div>
+      </div>
+      <div class="card">
+        <span class="tag">Tornillo sin fin</span>
+        <p>Es un engranaje cuyo elemento motor tiene <b>1 diente</b>: el mismo filo empuja un diente en cada vuelta. Z₂ son los dientes de la corona.</p>
+        <div class="formula" style="font-size:1.05rem">n₁ · 1 = n₂ · Z₂</div>
+        <div class="formula" style="font-size:1.05rem">i = <span class="frac"><span>1</span><span>Z₂</span></span></div>
+      </div>
+    </div>
+    <div class="note"><b>¡Ten cuidado!</b> Con dientes o diámetros el orden se invierte: se divide lo de la rueda <b>motriz</b> entre lo de la <b>conducida</b> (Z₁/Z₂, D₁/D₂). Con velocidades es al revés: n₂/n₁.</div>
+    <p>Estas ecuaciones permiten calcular una incógnita a partir de tres datos conocidos, igual que con la ley de la palanca. Pruébalo en el <a href="#circular" data-go="circular">banco de transmisión circular</a>.</p>
+  </div>
+
+  <div class="block">
+    <h3>Problemas resueltos</h3>
+    <details class="solved"><summary>Problema 1 · La rueda motriz gira a 120 rpm y la conducida a 30 rpm. ¿Relación de transmisión?</summary>
+      <div class="body"><span class="mono">i = n₂ / n₁ = 30 / 120 = 0,25</span><p>Como i &lt; 1, el engranaje es <b>reductor</b>: la conducida da una vuelta por cada 4 de la motriz.</p></div></details>
+    <details class="solved"><summary>Problema 2 · Motriz de 10 dientes y conducida de 30 dientes. ¿Relación de transmisión?</summary>
+      <div class="body"><span class="mono">i = Z₁ / Z₂ = 10 / 30 = 0,33</span><p>Reductor: la rueda grande gira tres veces más despacio que la pequeña.</p></div></details>
+    <details class="solved"><summary>Problema 3 · Se necesita i = 2,5 y la rueda motriz tiene 30 dientes. ¿Dientes de la conducida?</summary>
+      <div class="body"><span class="mono">i = Z₁ / Z₂ → Z₂ = Z₁ / i = 30 / 2,5 = 12 dientes</span><p>Como i &gt; 1, es un mecanismo <b>multiplicador</b>: la conducida es más pequeña y gira más rápido.</p></div></details>
+  </div>
+
+  <div class="block">
+    <h3>Practica</h3>
+    <div class="practice" data-gens="engranaje,poleas,sinfin,dientes"></div>
+    <p class="muted">Los ejercicios propuestos de la ficha 1 (poleas y engranajes) siguen disponibles en el <a href="https://sites.google.com/larioja.edu.es/2-eso-up02-mecanismos/introducci%C3%B3n-mecanismos-y-movimientos/transmisi%C3%B3n-circular/relaci%C3%B3n-de-transmisi%C3%B3n" target="_blank" rel="noopener">Google Site de la unidad</a>.</p>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="circular" type="button">← Transmisión circular</button><button class="btn primary" data-go="trenes" type="button">Siguiente: Trenes de engranajes →</button></div>
+</section>
+
+<!-- ============ 3.2 TRENES ============ -->
+<section class="page" id="trenes" data-title="Trenes de engranajes" hidden>
+  <div class="page-head">
+    <span class="kicker">Apartado 3.2 · Transmisión circular</span>
+    <h2>Trenes de engranajes</h2>
+    <p>Un tren de engranajes es un mecanismo formado por <b>más de dos ruedas dentadas</b>. Permiten conseguir grandes reducciones o aumentos de velocidad, algo muy difícil con un solo engranaje, y también modificar el sentido de giro de los ejes como se desee.</p>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <span class="tag">Tren simple</span>
+      <p>Las ruedas se colocan una a continuación de otra, <b>cada una en un eje diferente</b>. No consiguen grandes cambios de velocidad; sirven sobre todo para cambiar el sentido de giro. La rueda intermedia se llama <b>rueda loca</b>.</p><div data-figs="p5_0:Tren 10-15-20 a 8 rpm|p5_1:Tren 10-8-20 a 8 rpm"></div>
+      <div class="formula" style="font-size:1.05rem">i = <span class="frac"><span>Z<sub>primera</sub></span><span>Z<sub>última</sub></span></span><small>las ruedas intermedias no influyen</small></div>
+    </div>
+    <div class="card">
+      <span class="tag sig">Tren compuesto</span>
+      <p>Varias ruedas dentadas <b>comparten el mismo eje</b>. Son los más utilizados porque permiten variar la velocidad tanto como se desee.</p><div data-figs="p5_2:Tren compuesto reductor 10-20-10-20, 15 rpm"></div>
+      <div class="formula" style="font-size:1.05rem">i = <span class="frac"><span>Z₁ · Z₃ · Z₅</span><span>Z₂ · Z₄ · Z₆</span></span><small>motrices arriba, conducidas abajo</small></div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="stage">
+      <canvas id="cvTrain" aria-label="Simulador de trenes de engranajes" style="height:330px"></canvas>
+      <div class="cap">Animación ralentizada. Las flechas indican el sentido de giro de cada eje.</div>
+    </div>
+    <div class="ctrl">
+      <div class="lab-title">Simulador de trenes</div>
+      <div class="seg" id="trType" role="group" aria-label="Tipo de tren">
+        <button type="button" data-t="simple" aria-pressed="true">Simple</button>
+        <button type="button" data-t="comp" aria-pressed="false">Compuesto</button>
+      </div>
+      <div class="numrow">
+        <div class="num"><label for="trCount" id="trCountL">Nº de ruedas</label><select id="trCount"></select></div>
+        <div class="num"><label for="trN1">n₁ (rpm)</label><input id="trN1" type="number" value="8" min="0" step="any"></div>
+      </div>
+      <div class="numrow" id="trTeeth"></div>
+      <div class="formula" id="trFormula" style="font-size:.95rem"></div>
+      <dl class="readout">
+        <dt>n última</dt><dd class="big" id="trNl"></dd>
+        <dt>i</dt><dd id="trI"></dd>
+        <dt>Tipo</dt><dd id="trTypeOut"></dd>
+        <dt>Sentido</dt><dd id="trDir"></dd>
+      </dl>
+      <div style="font-size:.88rem" class="muted" id="trAxles"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>¿Por qué en el tren simple se anulan las intermedias?</h3>
+    <p>La relación de un tren se calcula multiplicando las relaciones de cada pareja de ruedas engranadas. En un tren simple de 6 ruedas, la 1 engrana con la 2, la 2 con la 3, etc.:</p>
+    <div class="formula" style="font-size:1rem">i = <span class="frac"><span>Z₁</span><span>Z₂</span></span>·<span class="frac"><span>Z₂</span><span>Z₃</span></span>·<span class="frac"><span>Z₃</span><span>Z₄</span></span>·<span class="frac"><span>Z₄</span><span>Z₅</span></span>·<span class="frac"><span>Z₅</span><span>Z₆</span></span> = <span class="frac"><span>Z₁</span><span>Z₆</span></span></div>
+    <p>Todos los términos, salvo el primero y el último, aparecen arriba y abajo, y se simplifican. En un tren compuesto, la rueda 2 y la 3 están en el mismo eje (y la 4 y la 5), así que las parejas engranadas son 1–2, 3–4 y 5–6 y los términos <b>no se anulan</b>.</p>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <span class="tag">Reductor · el coche</span>
+      <p>El motor de un coche gira a miles de rpm (fíjate en el marcador «RPM» y multiplica por 1000). Esa velocidad es excesiva para las ruedas, sobre todo al aparcar. Por eso se conectan con un <b>tren reductor</b> situado en la <b>caja de cambios</b>: al mover la palanca de cambios eliges qué combinación de engranajes trabaja.</p><div data-figs="p5_3:Cuentarrevoluciones (× 1000 rpm)|p5_4:Caja de cambios y palanca de cambios"></div>
+    </div>
+    <div class="card">
+      <span class="tag">Multiplicador · el aerogenerador</span>
+      <p>Las aspas de un aerogenerador giran despacio, pero para generar corriente eléctrica útil hacen falta velocidades mucho mayores. Se conecta un <b>tren multiplicador</b> al eje de las aspas para que el generador gire rápido aunque el viento sea suave.</p><div data-figs="p5_5:Tren compuesto multiplicador 30-10-30-10, 15 rpm|p5_6:Aerogeneradores"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Problemas resueltos</h3>
+    <details class="solved"><summary>Tren simple 10 – 15 – 20 dientes; la primera gira a 8 rpm. ¿Velocidad de la última?</summary>
+      <div class="body"><span class="mono">i = Z₁ / Z₃ = 10 / 20 = 0,5 → n₃ = 8 · 0,5 = 4 rpm</span><p>La rueda loca de 15 dientes no influye en la velocidad. Con tres ruedas, la primera y la última giran en el <b>mismo sentido</b>.</p></div></details>
+    <details class="solved"><summary>Tren compuesto 10 – 20 – 10 – 20; la primera gira a 15 rpm. ¿Velocidad de la última?</summary>
+      <div class="body"><span class="mono">i = (Z₁·Z₃) / (Z₂·Z₄) = (10·10) / (20·20) = 0,25 → n₄ = 15 · 0,25 = 3,75 rpm</span><p>Reductor. Hay dos parejas engranadas, así que el último eje gira en el <b>mismo sentido</b> que el primero.</p></div></details>
+    <details class="solved"><summary>Tren compuesto multiplicador 30 – 10 – 30 – 10 a 15 rpm. ¿Velocidad de la última?</summary>
+      <div class="body"><span class="mono">i = (30·30) / (10·10) = 9 → n₄ = 15 · 9 = 135 rpm</span><p>Multiplicador, como el de un aerogenerador.</p></div></details>
+  </div>
+
+  <div class="block">
+    <h3>Practica</h3>
+    <div class="practice" data-gens="trenSimple,trenComp,trenInverso"></div>
+    <p class="muted">Los ejercicios de la ficha 2 (trenes de engranajes) siguen disponibles en el <a href="https://sites.google.com/larioja.edu.es/2-eso-up02-mecanismos/introducci%C3%B3n-mecanismos-y-movimientos/transmisi%C3%B3n-circular/trenes-de-engranajes" target="_blank" rel="noopener">Google Site de la unidad</a>.</p>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="relacion" type="button">← Relación de transmisión</button><button class="btn primary" data-go="transformacion" type="button">Siguiente: Transformación →</button></div>
+</section>
+
+<!-- ============ 4. TRANSFORMACIÓN ============ -->
+<section class="page" id="transformacion" data-title="Transformación" hidden>
+  <div class="page-head">
+    <span class="kicker">Apartado 4 · Mecanismos de transformación</span>
+    <h2>Transformación de movimiento</h2>
+    <p>A veces hay que convertir un movimiento circular, como el de una manivela o un motor eléctrico, en un movimiento lineal o lineal alternativo. Lo vemos en los trenes cremallera, los taburetes de altura regulable o el motor de un coche.</p>
+  </div>
+
+  <div class="lab">
+    <div class="stage">
+      <canvas id="cvTrans" aria-label="Simulador de mecanismos de transformación" style="height:320px"></canvas>
+      <div class="cap" id="trCap"></div>
+    </div>
+    <div class="ctrl">
+      <div class="lab-title">Banco de transformación</div>
+      <div class="seg" id="tfMech" role="group" aria-label="Mecanismo">
+        <button type="button" data-m="crem" aria-pressed="true">Piñón-cremallera</button>
+        <button type="button" data-m="tuer" aria-pressed="false">Tornillo-tuerca</button>
+        <button type="button" data-m="biela" aria-pressed="false">Biela-manivela</button>
+        <button type="button" data-m="leva" aria-pressed="false">Leva</button>
+        <button type="button" data-m="yugo" aria-pressed="false">Yugo escocés</button>
+      </div>
+      <div id="tfCtrl" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>De circular a rectilíneo</h3>
+    <div class="cols">
+      <div class="card">
+        <span class="tag">Piñón-cremallera</span>
+        <p>Mecanismo <b>reversible</b>: transforma movimiento circular en lineal y viceversa. Lo forman un <b>piñón</b> (rueda dentada pequeña) y una <b>cremallera</b> (listón con dientes que encajan en el piñón).</p>
+        <p>Lo habitual es que el piñón mueva la cremallera. Permite un control bastante preciso (según el ángulo girado, la cremallera avanza más o menos), pero no admite grandes velocidades. Lo encontramos en puertas automáticas de garajes, en la dirección de los coches (volante → ruedas) y en el <b>tren cremallera de Núria</b> (Girona), que desde 1931 sube pendientes muy empinadas gracias a un tercer raíl dentado.</p><div data-figs="p6_0:Piñón-cremallera|p6_1:Dirección de un coche|p6_2:Del volante a las ruedas|p6_3:Tren cremallera"></div>
+        <div class="formula" style="font-size:1.05rem">Desplazamiento = n · t · l<small>n rpm · t minutos · l avance por vuelta del piñón</small></div>
+      </div>
+      <div class="card">
+        <span class="tag">Tornillo-tuerca</span>
+        <p>Un tornillo con una tuerca enroscada. Funciona de dos modos:</p>
+        <p>• Si giramos el tornillo e impedimos que gire la tuerca, <b>avanza el tornillo</b>: un sargento o un taburete.</p>
+        <p>• Si giramos el tornillo pero impedimos que se desplace, <b>avanza la tuerca</b>: un tornillo de banco o un gato.</p><div data-figs="p6_4:Sargento|p6_5:Tornillo de banco|p6_6:Taburete regulable|p6_7:Paso de rosca y avance"></div>
+        <div class="formula" style="font-size:1.05rem">v = p · n<small>p paso de rosca (mm/vuelta) · n rpm</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>De circular a rectilíneo alternativo</h3>
+    <div class="cols">
+      <div class="card">
+        <span class="tag sig">Biela-manivela</span>
+        <p>Transforma movimiento circular en rectilíneo alternativo y viceversa (<b>reversible</b>). La <b>manivela</b> es una barra unida a una rueda que gira, en un punto alejado del centro; la <b>biela</b> es una barra articulada a la manivela que hace un movimiento de vaivén, canalizado por una guía.</p>
+        <p>La manivela puede sustituirse por una <b>rueda excéntrica</b>: la biela se conecta a cierta distancia del centro del disco. Se usa en limpiaparabrisas, máquinas de coser… Se extendió en la Revolución Industrial, pero la máquina más antigua conocida con este sistema es la <b>serrería de Hierápolis</b> (siglo III d. C.), una doble sierra de piedra movida por una rueda hidráulica.</p><div data-figs="p6_8:Biela-manivela|p6_9:Manivela, biela, guía y émbolo|p6_10:Rueda excéntrica|p6_11:Serrería de Hierápolis"></div>
+      </div>
+      <div class="card">
+        <span class="tag sig">Cigüeñal · motores de combustión</span>
+        <p>La gran aplicación de la biela-manivela. En un motor de gasolina, la explosión del combustible empuja el <b>pistón</b> hacia abajo dentro del <b>cilindro</b>; la biela transforma ese movimiento lineal en el giro de un eje con codos llamado <b>cigüeñal</b>, que acaba moviendo las ruedas.</p>
+        <p>El cigüeñal es un <b>mecanismo biela-manivela múltiple</b>: cada codo actúa como una manivela. Para aumentar la potencia se conectan más cilindros al mismo cigüeñal: motores de 4, 5, 6, 8 y hasta 16 cilindros.</p><div data-figs="p6_12:Pistón, biela y cigüeñal|p6_13:Motor de cuatro cilindros"></div>
+      </div>
+      <div class="card">
+        <span class="tag sig">Leva-seguidor</span>
+        <p>Mecanismo <b>no reversible</b>: solo transforma circular en lineal, no al revés. Tiene tres partes: la <b>leva</b> (pieza con una forma determinada unida a un eje que gira), el <b>palpador</b> (suele ser un rodillo que rueda sobre la leva) y el <b>seguidor</b> (varilla que sube y baja según la superficie de la leva).</p>
+        <p>Es el más versátil: cambiando la forma de la leva se consigue casi cualquier movimiento del seguidor. Se usa para abrir y cerrar las válvulas de los motores, en telares, líneas de producción o sistemas de distribución de agua.</p><div data-figs="p6_14:Leva, palpador, seguidor y eje|p6_15:Leva de pera|p6_16:Leva de dos lóbulos|p6_17:Otra forma de leva"></div>
+      </div>
+      <div class="card">
+        <span class="tag sig">Yugo escocés</span>
+        <p>Mecanismo <b>reversible</b> que transforma circular en lineal alternativo. Frente a la biela-manivela tiene <b>menos piezas móviles</b> y un movimiento <b>menos brusco</b>. Se usa en ciertos motores, compresores de aire y en válvulas de gasoductos y oleoductos.</p><div data-figs="p6_18:Yugo escocés"></div>
+      </div>
+    </div>
+    <p class="muted">La presentación «Estación 9 · Levas y excéntricas» sigue disponible en el <a href="https://sites.google.com/larioja.edu.es/2-eso-up02-mecanismos/introducci%C3%B3n-mecanismos-y-movimientos/transformaci%C3%B3n-de-movimiento/levas-y-exc%C3%A9ntricas" target="_blank" rel="noopener">Google Site de la unidad</a>.</p>
+  </div>
+
+  <div class="block">
+    <h3>Practica</h3>
+    <div class="practice" data-gens="cremallera,tuerca"></div>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="trenes" type="button">← Trenes de engranajes</button><button class="btn primary" data-go="reto" type="button">Siguiente: Reto →</button></div>
+</section>
+
+<!-- ============ RETO ============ -->
+<section class="page" id="reto" data-title="Reto" hidden>
+  <div class="page-head">
+    <span class="kicker">Reto · Clasificación de mecanismos</span>
+    <h2>¿De qué tipo es cada mecanismo?</h2>
+    <p>Son los 15 mecanismos de la tabla resumen de la unidad. Para cada uno, elige el tipo según sus movimientos de entrada y salida. Al terminar verás la tabla completa.</p>
+  </div>
+  <div class="scorebar"><span class="pill st" id="sortScore">0 aciertos de 0</span><span class="muted" id="sortLeft"></span><button class="btn small" id="sortReset" type="button">Empezar de nuevo</button></div>
+  <div class="sortgrid" id="sortList"></div>
+  <div class="block" id="sortEnd" hidden>
+    <h3>Tabla resumen</h3>
+    <div class="tablewrap"><table class="sumtable">
+      <thead><tr><th>Tipo</th><th>Mecanismo</th></tr></thead>
+      <tbody>
+        <tr class="r1"><td>Transmisión lineal</td><td>Plano inclinado<br>Poleas<br>Palanca</td></tr>
+        <tr class="r2"><td>Transmisión circular</td><td>Engranajes y trenes<br>Poleas con correa<br>Engranajes con cadena o con correa dentada<br>Rueda de fricción<br>Tornillo sin fin</td></tr>
+        <tr class="r3"><td>Transformación de movimiento circular en <b>movimiento lineal</b></td><td>Tornillo-tuerca<br>Piñón-cremallera</td></tr>
+        <tr class="r4"><td>Transformación de movimiento circular en <b>movimiento lineal alternativo</b></td><td>Biela-manivela<br>Excéntrica-manivela<br>Leva-seguidor<br>Yugo escocés</td></tr>
+        <tr class="r5"><td>Otros</td><td>Cruz de Malta</td></tr>
+      </tbody></table></div>
+  </div>
+  <div class="pager"><button class="btn" data-go="transformacion" type="button">← Transformación</button><button class="btn primary" data-go="repaso" type="button">Siguiente: Repaso →</button></div>
+</section>
+
+<!-- ============ REPASO ============ -->
+<section class="page" id="repaso" data-title="Repaso" hidden>
+  <div class="page-head">
+    <span class="kicker">Autoevaluación</span>
+    <h2>Repaso de la unidad</h2>
+    <p>Doce preguntas sobre toda la unidad. Contesta todas y pulsa <b>Corregir</b> para ver tu nota y la explicación de cada respuesta.</p>
+  </div>
+  <div class="quiz" id="quiz"></div>
+  <div class="scorebar">
+    <button class="btn primary" id="quizCheck" type="button">Corregir</button>
+    <button class="btn" id="quizReset" type="button">Borrar respuestas</button>
+    <span id="quizScore" class="pill st" hidden></span>
+    <span id="quizBest" class="muted" style="font-size:.9rem"></span>
+  </div>
+  <div class="block">
+    <h3>Problemas aleatorios de toda la unidad</h3>
+    <div class="practice" data-gens="velocidad,rpm,palanca,engranaje,poleas,sinfin,trenSimple,trenComp,cremallera,tuerca"></div>
+  </div>
+  <div class="pager"><button class="btn" data-go="reto" type="button">← Reto</button><button class="btn primary" data-go="intro" type="button">Volver al inicio</button></div>
+</section>
+
+</main>
+<div class="wrap"><footer>UP02 Mecanismos · Tecnología 2º ESO · IES Marco Fabio Quintiliano. Versión interactiva del Google Site de la unidad. Imágenes y animaciones: Google Site de la unidad.</footer></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,el=document)=>el.querySelector(s), $$=(s,el=document)=>[...el.querySelectorAll(s)];
+const TAU=Math.PI*2;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString('es-ES',{maximumFractionDigits:d}):'—';
+const num=el=>{const v=parseFloat(String(el.value).replace(',','.'));return Number.isFinite(v)?v:NaN};
+
+/* ---------- Colores desde los tokens ---------- */
+let C={};
+function readColors(){const s=getComputedStyle(document.documentElement);const g=v=>s.getPropertyValue(v).trim();
+  C={ink:g('--ink'),muted:g('--muted'),line:g('--line'),steel:g('--steel'),signal:g('--signal'),panel:g('--panel'),paper:g('--paper'),ok:g('--ok'),bad:g('--bad'),ga:g('--gear-a'),gb:g('--gear-b'),gc:g('--gear-c'),mono:'"JetBrains Mono", ui-monospace, monospace'};}
+readColors();
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readColors)}catch(e){}
+new MutationObserver(readColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+document.fonts&&document.fonts.ready.then(readColors);
+
+/* ---------- Motor de escenas ---------- */
+const scenes=[];
+function sizeScene(s){const r=s.canvas.getBoundingClientRect();if(!r.width)return;const dpr=Math.min(2,window.devicePixelRatio||1);s.w=r.width;s.h=r.height;s.canvas.width=Math.round(r.width*dpr);s.canvas.height=Math.round(r.height*dpr);s.ctx.setTransform(dpr,0,0,dpr,0,0);}
+function scene(id,draw){const canvas=document.getElementById(id);const s={canvas,ctx:canvas.getContext('2d'),draw,w:0,h:0,t:0};try{new ResizeObserver(()=>sizeScene(s)).observe(canvas)}catch(e){}sizeScene(s);scenes.push(s);return s;}
+let paused=false,last=performance.now();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pauseBtn=$('#pauseBtn');
+function setPaused(p){paused=p;pauseBtn.setAttribute('aria-pressed',p);pauseBtn.textContent=p?'Reanudar animaciones':'Pausar animaciones';if(window.__syncVids)window.__syncVids();}
+pauseBtn.addEventListener('click',()=>setPaused(!paused));
+if(reduce)setPaused(true);
+function loop(now){const dt=paused?0:Math.min(.05,(now-last)/1000);last=now;
+  for(const s of scenes){if(!s.canvas.offsetParent)continue;if(!s.w||Math.abs(s.canvas.getBoundingClientRect().width-s.w)>1)sizeScene(s);if(!s.w)continue;s.t+=dt;s.ctx.clearRect(0,0,s.w,s.h);s.draw(s.ctx,s.w,s.h,dt,s);}
+  requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+
+/* ---------- Utilidades de dibujo ---------- */
+function arrowHead(ctx,x,y,ang,size,color){ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-size,-size*.55);ctx.lineTo(-size,size*.55);ctx.closePath();ctx.fill();ctx.restore();}
+function arrow(ctx,x1,y1,x2,y2,color,w=3){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();arrowHead(ctx,x2,y2,Math.atan2(y2-y1,x2-x1),10,color);}
+function spinArrow(ctx,cx,cy,R,dir,color){if(!dir)return;ctx.strokeStyle=color;ctx.lineWidth=2.5;const a0=-Math.PI*.85,a1=-Math.PI*.15;ctx.beginPath();ctx.arc(cx,cy,R,a0,a1);ctx.stroke();
+  if(dir>0)arrowHead(ctx,cx+R*Math.cos(a1),cy+R*Math.sin(a1),a1+Math.PI/2,9,color);else arrowHead(ctx,cx+R*Math.cos(a0),cy+R*Math.sin(a0),a0-Math.PI/2,9,color);}
+function label(ctx,txt,x,y,color,size=12,align='center',weight=600){ctx.fillStyle=color;ctx.font=`${weight} ${size}px ${C.mono}`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(txt,x,y);}
+function gear(ctx,cx,cy,z,m,ang,fill,showZ=true){const r=m*z/2,ra=r+m,rf=r-1.25*m,p=TAU/z;
+  ctx.beginPath();for(let k=0;k<z;k++){const a=ang+k*p;const pts=[[rf,a-p*.5],[rf,a-p*.28],[ra,a-p*.13],[ra,a+p*.13],[rf,a+p*.28]];
+    pts.forEach(([rr,aa],i)=>{const x=cx+rr*Math.cos(aa),y=cy+rr*Math.sin(aa);(k===0&&i===0)?ctx.moveTo(x,y):ctx.lineTo(x,y);});}
+  ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,Math.max(3,r*.18),0,TAU);ctx.fillStyle=C.panel;ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+Math.max(3,r*.18)*Math.cos(ang),cy+Math.max(3,r*.18)*Math.sin(ang));ctx.lineTo(cx+rf*.85*Math.cos(ang),cy+rf*.85*Math.sin(ang));ctx.lineWidth=2;ctx.stroke();
+  if(showZ&&r>18)label(ctx,'Z='+z,cx+rf*.5*Math.cos(ang+Math.PI),cy+rf*.5*Math.sin(ang+Math.PI),C.ink,Math.min(13,Math.max(10,r*.2)));}
+function wheel(ctx,cx,cy,r,ang,fill,groove=false){ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.stroke();
+  if(groove){ctx.beginPath();ctx.arc(cx,cy,r*.86,0,TAU);ctx.strokeStyle=C.muted;ctx.lineWidth=1;ctx.stroke();}
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;for(let k=0;k<3;k++){const a=ang+k*TAU/3;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*.8*Math.cos(a),cy+r*.8*Math.sin(a));ctx.stroke();}
+  ctx.beginPath();ctx.arc(cx,cy,Math.max(3,r*.12),0,TAU);ctx.fillStyle=C.panel;ctx.fill();ctx.stroke();}
+/* fase de engrane: devuelve el ángulo de la rueda conducida para que los dientes encajen */
+function meshAngle(aFrom,zFrom,zTo,theta){const pF=TAU/zFrom,pT=TAU/zTo;const f=(theta-aFrom)/pF;return theta+Math.PI+pT*(f+.5);} /* continuo: la marca de cada rueda no salta */
+function belt(ctx,x1,y1,r1,x2,y2,r2,crossed,offset,chain){const dx=x2-x1,dy=y2-y1,d=Math.hypot(dx,dy),base=Math.atan2(dy,dx);
+  ctx.save();ctx.translate(x1,y1);ctx.rotate(base);ctx.beginPath();
+  if(!crossed){const phi=Math.acos(Math.max(-1,Math.min(1,(r1-r2)/d)));
+    ctx.moveTo(r1*Math.cos(-phi),r1*Math.sin(-phi));ctx.lineTo(d+r2*Math.cos(-phi),r2*Math.sin(-phi));ctx.arc(d,0,r2,-phi,phi);ctx.lineTo(r1*Math.cos(phi),r1*Math.sin(phi));ctx.arc(0,0,r1,phi,TAU-phi);
+  }else{const phi=Math.acos(Math.max(-1,Math.min(1,(r1+r2)/d)));
+    ctx.moveTo(r1*Math.cos(phi),-r1*Math.sin(phi));ctx.lineTo(d-r2*Math.cos(phi),r2*Math.sin(phi));ctx.arc(d,0,r2,Math.PI-phi,phi-Math.PI,true);ctx.lineTo(r1*Math.cos(phi),r1*Math.sin(phi));ctx.arc(0,0,r1,phi,TAU-phi);}
+  ctx.closePath();
+  if(chain){ctx.strokeStyle=C.ink;ctx.lineWidth=7;ctx.setLineDash([]);ctx.stroke();ctx.strokeStyle=C.muted;ctx.lineWidth=4;ctx.setLineDash([6,4]);ctx.lineDashOffset=-offset;ctx.stroke();}
+  else{ctx.strokeStyle=C.ink;ctx.lineWidth=4;ctx.setLineDash([]);ctx.stroke();ctx.strokeStyle=C.signal;ctx.lineWidth=2;ctx.setLineDash([3,17]);ctx.lineDashOffset=-offset;ctx.stroke();}
+  ctx.setLineDash([]);ctx.restore();}
+
+/* ======================= NAVEGACIÓN ======================= */
+const pages=$$('.page'),tabs=$$('.tabs button');
+function show(id,scroll=true){if(!document.getElementById(id))id='intro';
+  pages.forEach(p=>p.hidden=p.id!==id);tabs.forEach(t=>t.setAttribute('aria-current',t.dataset.p===id?'page':'false'));
+  try{history.replaceState(null,'','#'+id)}catch(e){}
+  const tab=tabs.find(t=>t.dataset.p===id),sc=$('.tabs .scroller');
+  if(tab&&sc){const l=tab.offsetLeft-sc.offsetLeft,r=l+tab.offsetWidth;if(l<sc.scrollLeft)sc.scrollLeft=l-16;else if(r>sc.scrollLeft+sc.clientWidth)sc.scrollLeft=r-sc.clientWidth+16;}
+  if(scroll){const hd=$('header.top');const y=hd.offsetTop+hd.offsetHeight;if(window.scrollY>y)window.scrollTo(0,y);}
+  if(window.__syncVids)window.__syncVids();
+  store.set('mec_tab',id);requestAnimationFrame(()=>scenes.forEach(sizeScene));}
+tabs.forEach((t,k)=>{t.addEventListener('click',e=>{e.preventDefault();show(t.dataset.p);});t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=tabs[(k+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.focus();show(n.dataset.p,false);}});});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(document.getElementById(h)&&$('#'+h).classList.contains('page'))show(h);});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){e.preventDefault();show(g.dataset.go);}});
+const startHash=(location.hash||'').slice(1);
+show(document.getElementById(startHash)?startHash:store.get('mec_tab','intro'),false);
+
+/* ======================= 1. INTRO ======================= */
+/* estructura vs mecanismo */
+const st={ang:-Math.PI/2.6,drag:null,shake:0};
+const sStruct=scene('cvStruct',(ctx,w,h,dt)=>{
+  const half=w/2,base=h*.78,L=Math.min(h*.45,half*.42);
+  // separador
+  ctx.strokeStyle=C.line;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(half,16);ctx.lineTo(half,h-16);ctx.stroke();ctx.setLineDash([]);
+  label(ctx,'ESTRUCTURA',half/2,20,C.muted,11);label(ctx,'MECANISMO',half*1.5,20,C.muted,11);
+  // triángulo
+  st.shake=Math.max(0,st.shake-dt*3);const sx=Math.sin(st.shake*40)*st.shake*4;
+  const A={x:half/2-L*.6,y:base},B={x:half/2+L*.6,y:base},T={x:half/2+sx,y:base-L*.95};
+  ctx.strokeStyle=C.ink;ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(T.x,T.y);ctx.closePath();ctx.stroke();
+  [A,B].forEach(p=>{ctx.fillStyle=C.steel;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-10,p.y+16);ctx.lineTo(p.x+10,p.y+16);ctx.fill();});
+  ctx.fillStyle=C.bad;ctx.beginPath();ctx.arc(T.x,T.y,9,0,TAU);ctx.fill();
+  st.tri=T;
+  // cuadrilátero articulado
+  const P={x:half*1.5-L*.6,y:base},Q={x:half*1.5+L*.6,y:base};
+  const Cc={x:Q.x+L*Math.cos(st.ang),y:Q.y+L*Math.sin(st.ang)},D={x:Cc.x-(Q.x-P.x),y:Cc.y};
+  ctx.strokeStyle=C.ink;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(P.x,P.y);ctx.lineTo(Q.x,Q.y);ctx.lineTo(Cc.x,Cc.y);ctx.lineTo(D.x,D.y);ctx.closePath();ctx.stroke();
+  [P,Q].forEach(p=>{ctx.fillStyle=C.steel;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-10,p.y+16);ctx.lineTo(p.x+10,p.y+16);ctx.fill();});
+  [D].forEach(p=>{ctx.fillStyle=C.panel;ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,5,0,TAU);ctx.fill();ctx.stroke();});
+  ctx.fillStyle=C.bad;ctx.beginPath();ctx.arc(Cc.x,Cc.y,9,0,TAU);ctx.fill();
+  st.mec=Cc;st.Q=Q;st.L=L;
+});
+(function(){const cv=sStruct.canvas;const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener('pointerdown',e=>{const p=pos(e);if(st.mec&&Math.hypot(p.x-st.mec.x,p.y-st.mec.y)<26){st.drag='m';cv.setPointerCapture(e.pointerId);}
+    else if(st.tri&&Math.hypot(p.x-st.tri.x,p.y-st.tri.y)<26){st.drag='t';st.shake=1;$('#structMsg').textContent='El triángulo no se deforma: sus barras forman una estructura rígida. Ahora prueba con el cuadrilátero.';}});
+  cv.addEventListener('pointermove',e=>{if(st.drag!=='m')return;const p=pos(e);let a=Math.atan2(p.y-st.Q.y,p.x-st.Q.x);if(a>-.25)a=a>Math.PI/2?-Math.PI+.25:-.25;if(a<-Math.PI+.25)a=-Math.PI+.25;st.ang=a;
+    $('#structMsg').textContent='¡Se deforma! Sus piezas se desplazan unas respecto a otras: es un mecanismo.';});
+  const up=()=>{st.drag=null};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);})();
+
+/* animaciones de movimiento */
+scene('cvMovLin',(ctx,w,h,dt,s)=>{const x=16+((s.t*60)%(w-60));ctx.strokeStyle=C.line;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(10,h/2+14);ctx.lineTo(w-10,h/2+14);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=C.ga;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.fillRect(x,h/2-14,36,28);ctx.strokeRect(x,h/2-14,36,28);arrow(ctx,x+42,h/2,x+70,h/2,C.signal,2.5);});
+scene('cvMovCir',(ctx,w,h,dt,s)=>{const r=h*.36,cx=w/2,cy=h/2,a=s.t*1.4;ctx.strokeStyle=C.line;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=C.muted;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));ctx.stroke();label(ctx,'r',cx+r*.5*Math.cos(a)+8,cy+r*.5*Math.sin(a)-8,C.muted,11);
+  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(cx,cy,3,0,TAU);ctx.fill();ctx.fillStyle=C.signal;ctx.beginPath();ctx.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),9,0,TAU);ctx.fill();});
+scene('cvMovLinAlt',(ctx,w,h,dt,s)=>{const A=(w-80)/2,x=w/2+A*Math.sin(s.t*2)-18;ctx.strokeStyle=C.line;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(20,h/2+14);ctx.lineTo(w-20,h/2+14);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=C.ga;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.fillRect(x,h/2-14,36,28);ctx.strokeRect(x,h/2-14,36,28);
+  const v=Math.cos(s.t*2);if(Math.abs(v)>.15)arrow(ctx,x+18,h/2-24,x+18+34*Math.sign(v),h/2-24,C.signal,2.5);});
+scene('cvMovCirAlt',(ctx,w,h,dt,s)=>{const L=h*.72,cx=w/2,cy=10,a=.6*Math.sin(s.t*2.2);ctx.strokeStyle=C.line;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(cx,cy,L,Math.PI/2-.65,Math.PI/2+.65);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cx-30,cy);ctx.lineTo(cx+30,cy);ctx.stroke();
+  const bx=cx+L*Math.sin(a),by=cy+L*Math.cos(a);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(bx,by);ctx.stroke();ctx.fillStyle=C.signal;ctx.beginPath();ctx.arc(bx,by,11,0,TAU);ctx.fill();});
+
+/* calculadoras */
+function calcV(){const d=num($('#cDist')),t=num($('#cTime'));$('#cVel').textContent=t>0?fmt(d/t)+' m/s':'t debe ser mayor que 0';}
+function calcN(){const v=num($('#cTurns')),t=num($('#cMin'));$('#cRpm').textContent=t>0?fmt(v/t)+' rpm':'t debe ser mayor que 0';}
+['cDist','cTime'].forEach(i=>$('#'+i).addEventListener('input',calcV));['cTurns','cMin'].forEach(i=>$('#'+i).addEventListener('input',calcN));calcV();calcN();
+
+/* reto clasificar */
+const MALTA='<svg viewBox="0 0 120 90" role="img" aria-label="Cruz de Malta"><g fill="#BFD3E8" stroke="#16212C" stroke-width="1.5"><path d="M44 12 L50 12 L50 30 L56 30 L56 12 L62 12 A30 30 0 0 1 82 32 L82 38 L64 38 L64 44 L82 44 L82 50 A30 30 0 0 1 62 70 L56 70 L56 52 L50 52 L50 70 L44 70 A30 30 0 0 1 24 50 L24 44 L42 44 L42 38 L24 38 L24 32 A30 30 0 0 1 44 12 Z"/></g><circle cx="53" cy="41" r="3" fill="#16212C"/><g fill="#F6C9A9" stroke="#16212C" stroke-width="1.5"><path d="M96 64 m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0"/></g><line x1="96" y1="64" x2="80" y2="50" stroke="#16212C" stroke-width="3"/><circle cx="80" cy="50" r="3.5" fill="#D9590B"/></svg>';
+const SORT=[['Plano inclinado','L','p2_0.webp'],['Poleas','L','p2_1.webp'],['Palanca','L','p2_3.webp'],
+ ['Engranajes y trenes','C','p3_0.webp'],['Poleas con correa','C','p3_9.webp'],['Engranajes con cadena o con correa dentada','C','p4_2.webp'],['Rueda de fricción','C','p3_12.webp'],['Tornillo sin fin','C','p4_6_poster.webp'],
+ ['Tornillo-tuerca','TL','p6_7_poster.webp'],['Piñón-cremallera','TL','p6_0_poster.webp'],
+ ['Biela-manivela','TA','p6_9.webp'],['Excéntrica-manivela','TA','p6_10.webp'],['Leva-seguidor','TA','p6_14.webp'],['Yugo escocés','TA','p6_18_poster.webp'],
+ ['Cruz de Malta','O',null]];
+const CAT={L:'Transmisión lineal',C:'Transmisión circular',TL:'Transformación → lineal',TA:'Transformación → lineal alternativo',O:'Otros'};
+function renderSort(){const box=$('#sortList');box.innerHTML='';let ok=0,done=0;$('#sortEnd').hidden=true;
+  const list=SORT.slice().sort(()=>Math.random()-.5);
+  const upd=()=>{$('#sortScore').textContent=`${ok} aciertos de ${done}`;$('#sortLeft').textContent=done<SORT.length?`Quedan ${SORT.length-done}`:'¡Completado! Revisa la tabla resumen al final.';if(done===SORT.length)$('#sortEnd').hidden=false;};
+  list.forEach(([name,cat,img])=>{const card=document.createElement('div');card.className='scard';
+    card.innerHTML=`<div class="sthumb">${img?`<img src="media/${img}" alt="${name}" loading="lazy">`:MALTA}</div><b class="sname">${name}</b><div class="opts"></div><div class="sfb"></div>`;
+    const opts=card.querySelector('.opts');
+    Object.entries(CAT).forEach(([k,txt])=>{const b=document.createElement('button');b.type='button';b.textContent=txt;b.addEventListener('click',()=>{
+      done++;if(k===cat){ok++;card.classList.add('right');card.querySelector('.sfb').textContent='Correcto';}else{card.classList.add('wrong');card.querySelector('.sfb').textContent='Es: '+CAT[cat];}
+      opts.querySelectorAll('button').forEach(x=>{x.disabled=true;if(x===b)x.classList.add('picked');});upd();});opts.appendChild(b);});
+    box.appendChild(card);});upd();}
+$('#sortReset').addEventListener('click',renderSort);renderSort();
+
+/* imágenes y animaciones del Google Site */
+const GIFS=new Set(['p3_3','p3_4','p3_5','p3_6','p3_10','p3_11','p3_14','p3_15','p5_0','p5_1','p5_2','p5_5','p6_0','p6_2','p6_7','p6_8','p6_12','p6_13','p6_15','p6_16','p6_17','p6_18']);
+$$('[data-figs]').forEach(box=>{box.classList.add('figs');box.innerHTML=box.dataset.figs.split('|').map(x=>{const k=x.indexOf(':'),id=x.slice(0,k),cap=x.slice(k+1);
+  return `<figure class="fig">${GIFS.has(id)?`<video data-v muted loop playsinline preload="none" poster="media/${id}_poster.webp" aria-label="${cap}" title="Toca para pausar o reanudar"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video>`:`<img loading="lazy" src="media/${id}.webp" alt="${cap}">`}<figcaption>${cap}</figcaption></figure>`;}).join('');});
+const vids=$$('video[data-v]');
+function syncVid(v){const on=v._vis&&!paused&&!v._stop&&v.offsetParent!==null;if(on){v.preload='auto';const pr=v.play();pr&&pr.catch(()=>{});}else if(!v.paused)v.pause();}
+window.__syncVids=()=>vids.forEach(syncVid);
+try{const io=new IntersectionObserver(es=>es.forEach(e=>{e.target._vis=e.isIntersecting;syncVid(e.target);}),{threshold:.15});vids.forEach(v=>io.observe(v));}catch(e){vids.forEach(v=>{v._vis=true;});}
+vids.forEach(v=>v.addEventListener('click',()=>{v._stop=!v._stop;syncVid(v);}));
+window.__syncVids();
+
+/* ======================= 2. PALANCA ======================= */
+const lv={g:1,P:50,bp:2,R:100,br:1,ang:0};
+function leverUpdate(){lv.P=+$('#lvP').value;lv.bp=+$('#lvBp').value;lv.R=+$('#lvR').value;lv.br=+$('#lvBr').value;
+  $('#lvPo').textContent=lv.P+' N';$('#lvBpo').textContent=fmt(lv.bp)+' m';$('#lvRo').textContent=lv.R+' N';$('#lvBro').textContent=fmt(lv.br)+' m';
+  const mp=lv.P*lv.bp,mr=lv.R*lv.br;$('#lvMp').textContent=fmt(mp)+' N·m';$('#lvMr').textContent=fmt(mr)+' N·m';
+  const eq=Math.abs(mp-mr)<1e-6;$('#lvState').innerHTML=eq?'<span class="pill ok">En equilibrio</span>':mp>mr?'<span class="pill sg">Se mueve hacia el lado de la potencia</span>':'<span class="pill st">Se mueve hacia el lado de la resistencia</span>';
+  let hint=eq?'P · bp = R · br: la palanca no se mueve.':`Para el equilibrio, P debería valer R·br / bp = ${fmt(mr/lv.bp)} N.`;
+  if(lv.g===2&&lv.br>=lv.bp)hint+=' Ojo: en una palanca de 2º grado la resistencia está entre el apoyo y la potencia, así que br < bp.';
+  if(lv.g===3&&lv.bp>=lv.br)hint+=' Ojo: en una palanca de 3er grado la potencia está entre el apoyo y la resistencia, así que bp < br.';
+  $('#lvHint').textContent=hint;}
+['lvP','lvBp','lvR','lvBr'].forEach(i=>$('#'+i).addEventListener('input',leverUpdate));
+$$('#leverGrade button').forEach(b=>b.addEventListener('click',()=>{lv.g=+b.dataset.g;$$('#leverGrade button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const pre={1:[50,2,100,1],2:[40,3,120,1],3:[150,1,50,3]}[lv.g];['lvP','lvBp','lvR','lvBr'].forEach((id,i)=>$('#'+id).value=pre[i]);lv.ang=0;leverUpdate();}));
+$('#lvReset').addEventListener('click',()=>{lv.ang=0;});
+leverUpdate();
+scene('cvLever',(ctx,w,h,dt)=>{const mp=lv.P*lv.bp,mr=lv.R*lv.br,diff=mp-mr;
+  // posiciones a lo largo de la barra (m), apoyo en 0
+  let xR,xP;if(lv.g===1){xR=-lv.br;xP=lv.bp;}else if(lv.g===2){xR=lv.br;xP=lv.bp;}else{xP=lv.bp;xR=lv.br;}
+  const minX=Math.min(0,xR,xP)-.3,maxX=Math.max(0,xR,xP)+.3,span=maxX-minX;const k=(w*.86)/span;const fx=w*.07-minX*k,fy=h*.56;
+  const dir=(lv.g===1?1:-1)*Math.sign(Math.abs(diff)<1e-6?0:diff);lv.ang=Math.max(-.2,Math.min(.2,lv.ang+dir*.25*dt));
+  const a=lv.ang,pt=x=>({x:fx+x*k*Math.cos(a),y:fy+x*k*Math.sin(a)});
+  // suelo y fulcro
+  ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(10,fy+34);ctx.lineTo(w-10,fy+34);ctx.stroke();
+  ctx.fillStyle=C.steel;ctx.beginPath();ctx.moveTo(fx,fy+5);ctx.lineTo(fx-17,fy+34);ctx.lineTo(fx+17,fy+34);ctx.closePath();ctx.fill();
+  // barra
+  const b0=pt(minX+.1),b1=pt(maxX-.1);ctx.strokeStyle=C.ink;ctx.lineWidth=9;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b0.x,b0.y);ctx.lineTo(b1.x,b1.y);ctx.stroke();ctx.lineCap='butt';
+  ctx.fillStyle=C.panel;ctx.beginPath();ctx.arc(fx,fy,4,0,TAU);ctx.fill();
+  // resistencia: bloque colgando
+  const pr=pt(xR),bs=Math.min(60,22+lv.R/8),bh=bs*.75,by=pr.y-5-bh;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;
+  ctx.fillStyle=C.gb;ctx.fillRect(pr.x-bs/2,by,bs,bh);ctx.strokeRect(pr.x-bs/2,by,bs,bh);label(ctx,'R',pr.x,by+bh/2,C.ink,13,'center',700);
+  // potencia: flecha
+  const pp=pt(xP),Lp=Math.min(80,24+lv.P/4);
+  if(lv.g===1){arrow(ctx,pp.x,pp.y-Lp-6,pp.x,pp.y-7,C.signal,4);label(ctx,'P = '+lv.P+' N',pp.x,pp.y-Lp-18,C.signal,12);}
+  else{arrow(ctx,pp.x,pp.y-6,pp.x,pp.y-Lp-6,C.signal,4);label(ctx,'P = '+lv.P+' N',pp.x,pp.y-Lp-20,C.signal,12);}
+  label(ctx,'R = '+lv.R+' N',pr.x,by-14,C.steel,12);
+  // cotas
+  const cy=fy+52;function cota(x0,x1,t,col){const X0=fx+x0*k,X1=fx+x1*k;ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X0,cy);ctx.lineTo(X1,cy);ctx.moveTo(X0,cy-5);ctx.lineTo(X0,cy+5);ctx.moveTo(X1,cy-5);ctx.lineTo(X1,cy+5);ctx.stroke();label(ctx,t,(X0+X1)/2,cy+12,col,11);}
+  if(lv.g===1){cota(xR,0,'br = '+fmt(lv.br)+' m',C.steel);cota(0,xP,'bp = '+fmt(lv.bp)+' m',C.signal);}
+  else{const cy2=cy;cota(0,xR,'br = '+fmt(lv.br)+' m',C.steel);ctx.save();ctx.translate(0,26);cota(0,xP,'bp = '+fmt(lv.bp)+' m',C.signal);ctx.restore();}
+  label(ctx,['','PALANCA DE 1er GRADO · apoyo en medio','PALANCA DE 2º GRADO · resistencia en medio','PALANCA DE 3er GRADO · potencia en medio'][lv.g],w/2,16,C.muted,11);
+});
+/* tipos de palanca: SVG */
+function leverSVG(g){const y=50;let F,Rx,Px;if(g===1){F=100;Rx=35;Px=172;}else if(g===2){F=22;Rx=95;Px=180;}else{F=22;Px=95;Rx=180;}
+  const up=g!==1;const ar=up?`<line x1="${Px}" y1="${y-4}" x2="${Px}" y2="${y-30}" class="sv-f"/><polygon points="${Px},${y-40} ${Px-6},${y-28} ${Px+6},${y-28}" class="sv-fh"/>`:`<line x1="${Px}" y1="${y-40}" x2="${Px}" y2="${y-14}" class="sv-f"/><polygon points="${Px},${y-4} ${Px-6},${y-16} ${Px+6},${y-16}" class="sv-fh"/>`;
+  return `<svg class="svgfig" viewBox="0 0 200 92" role="img" aria-label="Esquema de palanca de grado ${g}"><line x1="12" y1="${y}" x2="192" y2="${y}" class="sv-line" style="stroke-width:5"/><polygon points="${F},${y+3} ${F-11},${y+22} ${F+11},${y+22}" class="sv-ful"/><line x1="${Rx}" y1="${y}" x2="${Rx}" y2="${y+12}" class="sv-thin"/><rect x="${Rx-12}" y="${y+12}" width="24" height="18" class="sv-load"/><text x="${Rx}" y="${y+25}" text-anchor="middle" class="sv-t">R</text>${ar}<text x="${Px+9}" y="${y-28}" class="sv-t" fill="var(--signal)">P</text></svg>`;}
+$('#leverTypes').innerHTML=[[1,'Primer grado','El punto de apoyo está entre la potencia y la resistencia.','Balancín, tijeras, alicates, balanza.'],[2,'Segundo grado','La resistencia está entre el apoyo y la potencia. Siempre reduce el esfuerzo.','Carretilla, cascanueces, abrebotellas.'],[3,'Tercer grado','La potencia está entre el apoyo y la resistencia. Siempre necesita más esfuerzo, pero da precisión.','Pinzas, caña de pescar, quitagrapas, el brazo humano.']]
+  .map(([g,t,d,e])=>`<div class="card"><span class="tag">${t}</span>${leverSVG(g)}<p>${d}</p><p class="muted">Ejemplos: ${e}</p></div>`).join('');
+
+/* ======================= 3. TRANSMISIÓN CIRCULAR ======================= */
+const MECH={eng:{sym:'Z',u:'dientes',min:8,max:60,a:12,b:36,rel:-1,f:'n₁ · Z₁ = n₂ · Z₂   →   i = Z₁ / Z₂'},
+  pol:{sym:'D',u:'cm',min:2,max:20,a:6,b:12,rel:1,f:'n₁ · D₁ = n₂ · D₂   →   i = D₁ / D₂'},
+  cru:{sym:'D',u:'cm',min:2,max:20,a:10,b:6,rel:-1,f:'n₁ · D₁ = n₂ · D₂   →   i = D₁ / D₂'},
+  fri:{sym:'D',u:'cm',min:2,max:20,a:8,b:14,rel:-1,f:'n₁ · D₁ = n₂ · D₂   →   i = D₁ / D₂'},
+  cad:{sym:'Z',u:'dientes',min:8,max:50,a:44,b:16,rel:1,f:'n₁ · Z₁ = n₂ · Z₂   →   i = Z₁ / Z₂'},
+  sin:{sym:'Z',u:'dientes',min:10,max:60,a:1,b:30,rel:0,f:'n₁ · 1 = n₂ · Z₂   →   i = 1 / Z₂'}};
+const ci={m:'eng',a:12,b:36,n1:120,a1:0,a2:0,off:0};
+function circSetMech(m){ci.m=m;const M=MECH[m];$$('#circMech button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===m));
+  const A=$('#circA'),B=$('#circB');A.min=B.min=M.min;A.max=B.max=M.max;A.value=M.a;B.value=M.b;$('#circAWrap').hidden=m==='sin';
+  $('#circAl').textContent=m==='cad'?'Z₁ (plato, motriz)':`${M.sym}₁ (motriz)`;$('#circBl').textContent=m==='sin'?'Z₂ (dientes de la corona)':m==='cad'?'Z₂ (piñón, conducido)':`${M.sym}₂ (conducida)`;
+  $('#circFormula').textContent=M.f;ci.a1=ci.a2=0;circUpdate();}
+function circUpdate(){const M=MECH[ci.m];ci.a=ci.m==='sin'?1:+$('#circA').value;ci.b=+$('#circB').value;ci.n1=num($('#circN1'));
+  $('#circAo').textContent=ci.a+' '+M.u;$('#circBo').textContent=ci.b+' '+M.u;const i=ci.a/ci.b,n2=ci.n1*i;
+  $('#circN2').textContent=Number.isFinite(n2)?fmt(n2)+' rpm':'—';$('#circI').textContent=(ci.m==='sin'?`1 / ${ci.b} = `:`${ci.a} / ${ci.b} = `)+fmt(i,3);
+  $('#circType').innerHTML=Math.abs(i-1)<1e-9?'<span class="pill ok">Directo</span>':i>1?'<span class="pill sg">Multiplicador</span>':'<span class="pill st">Reductor</span>';
+  $('#circDir').textContent=M.rel===-1?'Se invierte':M.rel===1?'Se mantiene':'Ejes perpendiculares';}
+$$('#circMech button').forEach(b=>b.addEventListener('click',()=>circSetMech(b.dataset.m)));
+['circA','circB','circN1'].forEach(i=>$('#'+i).addEventListener('input',circUpdate));
+circSetMech('eng');
+scene('cvCirc',(ctx,w,h,dt)=>{const M=MECH[ci.m],a=ci.a,b=ci.b,ratio=a/b;const visW=TAU*(ci.m==='sin'?40:12)/60*(ci.n1>0?1:0);
+  ci.a1+=visW*dt;const cy=h/2+6;
+  if(ci.m==='eng'){const m=Math.min(w*.9/(a+b+2),h*.86/(Math.max(a,b)+2));const tot=m*(a+b+2),x1=(w-tot)/2+m*(a/2+1),x2=x1+m*(a+b)/2;
+    ci.a2=meshAngle(ci.a1,a,b,0);gear(ctx,x1,cy,a,m,ci.a1,C.ga);gear(ctx,x2,cy,b,m,ci.a2,C.gb);
+    spinArrow(ctx,x1,cy,m*a/2+m+10,1,C.signal);spinArrow(ctx,x2,cy,m*b/2+m+10,-1,C.steel);}
+  else if(ci.m==='pol'||ci.m==='cru'||ci.m==='fri'){const touch=ci.m==='fri';const dU=touch?(a+b)/2:(a+b)/2+Math.max(a,b)*.55+2;const totU=a/2+dU+b/2;const k=Math.min(w*.88/totU,h*.8/Math.max(a,b));
+    const r1=a*k/2,r2=b*k/2,x1=(w-totU*k)/2+r1,x2=x1+dU*k;const s=ci.m==='pol'?1:-1;ci.a2+=s*visW*ratio*dt;ci.off+=visW*r1*dt;
+    if(!touch)belt(ctx,x1,cy,r1,x2,cy,r2,ci.m==='cru',ci.off,false);wheel(ctx,x1,cy,r1,ci.a1,C.ga,!touch);wheel(ctx,x2,cy,r2,ci.a2,C.gb,!touch);
+    label(ctx,'D₁='+a,x1,cy+r1+16,C.ink,11);label(ctx,'D₂='+b,x2,cy+r2+16,C.ink,11);
+    spinArrow(ctx,x1,cy,r1+12,1,C.signal);spinArrow(ctx,x2,cy,r2+12,s,C.steel);}
+  else if(ci.m==='cad'){const m0=1;const r1u=a/2,r2u=b/2,dU=r1u+r2u+Math.max(r1u,r2u)*.9;const totU=r1u+dU+r2u+2;const k=Math.min(w*.88/totU,h*.78/(2*Math.max(r1u,r2u)+2));
+    const r1=r1u*k,r2=r2u*k,x1=(w-totU*k)/2+r1+k,x2=x1+dU*k;ci.a2+=visW*ratio*dt;ci.off+=visW*r1*dt;
+    gear(ctx,x1,cy,a,k,ci.a1,C.ga,false);gear(ctx,x2,cy,b,k,ci.a2,C.gb,false);belt(ctx,x1,cy,r1,x2,cy,r2,false,ci.off,true);
+    label(ctx,'Z₁='+a,x1,cy+r1+k+16,C.ink,11);label(ctx,'Z₂='+b,x2,cy+r2+k+16,C.ink,11);spinArrow(ctx,x1,cy,r1+k+12,1,C.signal);spinArrow(ctx,x2,cy,r2+k+12,1,C.steel);}
+  else{ // sinfín
+    const m=Math.min(w*.75/(b+2),(h*.62)/(b+2));const r=m*b/2,gx=w/2,gy=h*.58;ci.a2+=visW/b*dt;gear(ctx,gx,gy,b,m,ci.a2,C.gb);
+    const wy=gy-r-m*.1,wh=m*3.2,ww=Math.min(w*.8,r*2.6);const x0=gx-ww/2;ctx.save();ctx.beginPath();ctx.rect(x0,wy-wh/2,ww,wh);ctx.clip();
+    ctx.fillStyle=C.ga;ctx.fillRect(x0,wy-wh/2,ww,wh);const pitch=m*Math.PI;const off=((ci.a1/TAU)*pitch)%pitch;ctx.strokeStyle=C.ink;ctx.lineWidth=2.5;
+    for(let x=x0-pitch*2+off;x<x0+ww+pitch;x+=pitch){ctx.beginPath();ctx.moveTo(x,wy+wh/2);ctx.lineTo(x+pitch*.45,wy-wh/2);ctx.stroke();}ctx.restore();
+    ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.strokeRect(x0,wy-wh/2,ww,wh);ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x0-24,wy);ctx.lineTo(x0,wy);ctx.moveTo(x0+ww,wy);ctx.lineTo(x0+ww+24,wy);ctx.stroke();
+    label(ctx,'tornillo sin fin (motriz)',gx,wy-wh/2-12,C.signal,11);label(ctx,'corona Z='+b,gx,gy+r+m+14,C.steel,11);spinArrow(ctx,gx,gy,r+m+8,1,C.steel);}
+});
+
+/* ======================= 3.2 TRENES ======================= */
+const tr={type:'simple',count:3,zs:[10,15,20],pairs:[[10,20],[10,20]],n1:8,a0:0};
+function trBuild(){const sel=$('#trCount');sel.innerHTML='';const box=$('#trTeeth');box.innerHTML='';
+  if(tr.type==='simple'){$('#trCountL').textContent='Nº de ruedas';[3,4,5].forEach(n=>sel.add(new Option(n+' ruedas',n,false,n===tr.count)));
+    tr.zs.slice(0,tr.count).forEach((z,i)=>box.insertAdjacentHTML('beforeend',`<div class="num"><label for="trz${i}">Z${sub(i+1)}${i===0?' motriz':''}</label><input id="trz${i}" type="number" min="6" max="80" step="1" value="${z}"></div>`));}
+  else{$('#trCountL').textContent='Nº de parejas';[2,3].forEach(n=>sel.add(new Option(n+' parejas ('+2*n+' ruedas)',n,false,n===tr.pairs.length)));
+    tr.pairs.forEach((p,j)=>p.forEach((z,q)=>{const i=2*j+q;box.insertAdjacentHTML('beforeend',`<div class="num"><label for="trz${i}">Z${sub(i+1)}${q===0?' motriz':' conducida'}</label><input id="trz${i}" type="number" min="6" max="80" step="1" value="${z}"></div>`);}));}
+  $$('#trTeeth input').forEach(inp=>inp.addEventListener('input',trRead));trRead();}
+const SUBS='₀₁₂₃₄₅₆₇₈₉';function sub(n){return String(n).split('').map(c=>SUBS[+c]).join('');}
+function clampZ(v){return Math.max(6,Math.min(80,Math.round(Number.isFinite(v)?v:10)));}
+function trRead(){tr.n1=num($('#trN1'));const vals=$$('#trTeeth input').map(i=>clampZ(num(i)));
+  if(tr.type==='simple'){vals.forEach((v,i)=>tr.zs[i]=v);}else{tr.pairs=tr.pairs.map((p,j)=>[vals[2*j],vals[2*j+1]]);}
+  trCompute();}
+function trModel(){ // devuelve ruedas, ejes y engranes
+  const gears=[],meshes=[];if(tr.type==='simple'){const zs=tr.zs.slice(0,tr.count);zs.forEach((z,i)=>gears.push({z,axle:i}));for(let i=0;i<zs.length-1;i++)meshes.push({f:i,t:i+1,th:(i%2?-.35:.35)});}
+  else{let ax=0;tr.pairs.forEach((p,j)=>{gears.push({z:p[0],axle:ax,plane:j%2});gears.push({z:p[1],axle:ax+1,plane:j%2});meshes.push({f:2*j,t:2*j+1,th:j===0?0:(j%2?.55:-.55)});ax++;});}
+  return{gears,meshes,axles:gears[gears.length-1].axle+1};}
+function trCompute(){const md=trModel();let i=1,num_='',den_='';const sp=[tr.n1];
+  md.meshes.forEach(ms=>{const zf=md.gears[ms.f].z,zt=md.gears[ms.t].z;i*=zf/zt;sp[md.gears[ms.t].axle]=tr.n1*i;});
+  const nl=tr.n1*i;tr.speeds=sp;
+  if(tr.type==='simple'){const zs=tr.zs.slice(0,tr.count);$('#trFormula').innerHTML=`i = Z${sub(1)} / Z${sub(zs.length)} = ${zs[0]} / ${zs[zs.length-1]} = ${fmt(i,3)}`;}
+  else{const top=tr.pairs.map(p=>p[0]),bot=tr.pairs.map(p=>p[1]);$('#trFormula').innerHTML=`i = (${top.join('·')}) / (${bot.join('·')}) = ${fmt(i,4)}`;}
+  $('#trNl').textContent=Number.isFinite(nl)?fmt(nl)+' rpm':'—';$('#trI').textContent=fmt(i,4);
+  $('#trTypeOut').innerHTML=Math.abs(i-1)<1e-9?'<span class="pill ok">Directo</span>':i>1?'<span class="pill sg">Multiplicador</span>':'<span class="pill st">Reductor</span>';
+  const same=(md.meshes.length%2)===0;$('#trDir').textContent=same?'La última gira en el mismo sentido que la primera':'La última gira en sentido contrario a la primera';
+  $('#trAxles').innerHTML=sp.map((n,k)=>`Eje ${k+1}: <b class="mono">${fmt(n)} rpm</b>`).join(' · ');}
+$$('#trType button').forEach(b=>b.addEventListener('click',()=>{tr.type=b.dataset.t;$$('#trType button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  if(tr.type==='comp'){$('#trN1').value=15;}else{$('#trN1').value=8;}trBuild();}));
+$('#trCount').addEventListener('change',e=>{const n=+e.target.value;if(tr.type==='simple'){tr.count=n;while(tr.zs.length<n)tr.zs.push(12);}else{tr.pairs=tr.pairs.slice(0,n);while(tr.pairs.length<n)tr.pairs.push([10,20]);}trBuild();});
+$('#trN1').addEventListener('input',trRead);
+trBuild();
+scene('cvTrain',(ctx,w,h,dt)=>{const md=trModel();const G=md.gears;
+  // posiciones en unidades de módulo
+  const pos=[];pos[0]={x:0,y:0};md.meshes.forEach(ms=>{const f=G[ms.f],t=G[ms.t];const pf=pos[ms.f];const d=(f.z+t.z)/2;pos[ms.t]={x:pf.x+d*Math.cos(ms.th),y:pf.y+d*Math.sin(ms.th)};
+    G.forEach((g,k)=>{if(k!==ms.t&&g.axle===t.axle&&!pos[k])pos[k]=pos[ms.t];});});
+  G.forEach((g,k)=>{if(!pos[k]){const o=G.findIndex((q,j)=>q.axle===g.axle&&pos[j]);pos[k]=pos[o];}});
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;G.forEach((g,k)=>{const r=g.z/2+1;x0=Math.min(x0,pos[k].x-r);x1=Math.max(x1,pos[k].x+r);y0=Math.min(y0,pos[k].y-r);y1=Math.max(y1,pos[k].y+r);});
+  const m=Math.min((w-30)/(x1-x0),(h-50)/(y1-y0));const ox=(w-(x1-x0)*m)/2-x0*m,oy=(h-20-(y1-y0)*m)/2-y0*m;
+  // ángulos
+  const visW=TAU*10/60*(tr.n1>0?1:0);tr.a0+=visW*dt;const axA=[tr.a0];
+  md.meshes.forEach(ms=>{const f=G[ms.f],t=G[ms.t];axA[t.axle]=meshAngle(axA[f.axle],f.z,t.z,ms.th);});
+  const last=md.axles-1;
+  const order=G.map((g,k)=>k).sort((p,q)=>((G[p].plane||0)-(G[q].plane||0)));
+  order.forEach(k=>{const g=G[k];const fill=g.axle===0?C.ga:g.axle===last?C.gb:C.gc;ctx.globalAlpha=(tr.type==='comp'&&g.plane===0&&G.some(q=>q.axle===g.axle&&q.plane===1))?.6:1;
+    gear(ctx,ox+pos[k].x*m,oy+pos[k].y*m,g.z,m,axA[g.axle],fill);ctx.globalAlpha=1;});
+  // flechas y velocidades por eje
+  for(let ax=0;ax<md.axles;ax++){const ks=G.map((g,k)=>k).filter(k=>G[k].axle===ax);const k=ks[0];const rmax=Math.max(...ks.map(q=>G[q].z))/2;const cx=ox+pos[k].x*m,cy=oy+pos[k].y*m;
+    const dir=ax%2===0?1:-1;spinArrow(ctx,cx,cy,(rmax+1)*m+8,dir,ax===0?C.signal:ax===last?C.steel:C.muted);
+    if(tr.speeds&&Number.isFinite(tr.speeds[ax]))label(ctx,fmt(tr.speeds[ax],1)+' rpm',cx,Math.min(h-10,cy+(rmax+1)*m+20),ax===0?C.signal:ax===last?C.steel:C.muted,11);}
+});
+
+/* ======================= 4. TRANSFORMACIÓN ======================= */
+const tf={m:'crem',ph:0,r:3,L:9,shape:'exc',hist:[],n:30,t:2,l:5,p:2,nn:60};
+const TFCAP={crem:'El piñón gira a un lado y a otro; la cremallera avanza en línea recta.',tuer:'Al girar el tornillo sin dejar que gire la tuerca, la tuerca avanza.',biela:'La carrera del pistón es el doble del radio de la manivela.',leva:'La gráfica de la derecha registra la altura del seguidor en cada instante.',yugo:'El pasador de la rueda desliza por la ranura del yugo y lo empuja adelante y atrás.'};
+function tfBuild(){const c=$('#tfCtrl');$('#trCap').textContent=TFCAP[tf.m];
+  if(tf.m==='crem'){c.innerHTML=`<p class="formula" style="font-size:1rem">Desplazamiento = n · t · l</p><div class="numrow"><div class="num"><label for="tfN">n (rpm)</label><input id="tfN" type="number" value="${tf.n}" step="any"></div><div class="num"><label for="tfT">t (min)</label><input id="tfT" type="number" value="${tf.t}" step="any"></div><div class="num"><label for="tfL">l (cm/vuelta)</label><input id="tfL" type="number" value="${tf.l}" step="any"></div></div><dl class="readout"><dt>Desplazamiento</dt><dd class="big" id="tfOut"></dd></dl>`;}
+  else if(tf.m==='tuer'){c.innerHTML=`<p class="formula" style="font-size:1rem">v = p · n</p><div class="numrow"><div class="num"><label for="tfP">p (mm/vuelta)</label><input id="tfP" type="number" value="${tf.p}" step="any"></div><div class="num"><label for="tfNN">n (rpm)</label><input id="tfNN" type="number" value="${tf.nn}" step="any"></div></div><dl class="readout"><dt>Velocidad de avance</dt><dd class="big" id="tfOut"></dd></dl>`;}
+  else if(tf.m==='biela'){c.innerHTML=`<div class="field"><label for="tfR">Radio de la manivela</label><output id="tfRo"></output><input id="tfR" type="range" min="1.5" max="5" step="0.5" value="${tf.r}"></div><div class="field"><label for="tfLb">Longitud de la biela</label><output id="tfLo"></output><input id="tfLb" type="range" min="7" max="14" step="0.5" value="${tf.L}"></div><dl class="readout"><dt>Carrera = 2 · r</dt><dd class="big" id="tfOut"></dd></dl><p class="muted" style="font-size:.9rem">Reversible: en un motor es el pistón el que empuja y hace girar la manivela (el cigüeñal).</p>`;}
+  else if(tf.m==='leva'){c.innerHTML=`<div class="seg" id="tfShape" role="group" aria-label="Forma de la leva">${[['exc','Excéntrica'],['pera','Pera'],['car','Caracol'],['dob','Dos lóbulos']].map(([k,t])=>`<button type="button" data-s="${k}" aria-pressed="${k===tf.shape}">${t}</button>`).join('')}</div><p>La forma de la leva decide el movimiento del seguidor. Fíjate en la gráfica: la excéntrica da una subida y bajada suave; el caracol sube poco a poco y cae de golpe.</p><p class="muted" style="font-size:.9rem">No reversible: empujar el seguidor no hace girar la leva.</p>`;
+    $$('#tfShape button').forEach(b=>b.addEventListener('click',()=>{tf.shape=b.dataset.s;tf.hist=[];$$('#tfShape button').forEach(x=>x.setAttribute('aria-pressed',x===b));}));}
+  else{c.innerHTML=`<div class="field"><label for="tfR">Radio del pasador</label><output id="tfRo"></output><input id="tfR" type="range" min="1.5" max="5" step="0.5" value="${tf.r}"></div><dl class="readout"><dt>Recorrido del yugo = 2 · r</dt><dd class="big" id="tfOut"></dd></dl><p class="muted" style="font-size:.9rem">Menos piezas móviles que la biela-manivela y un movimiento más suave.</p>`;}
+  $$('#tfCtrl input').forEach(i=>i.addEventListener('input',tfCalc));tfCalc();}
+function tfCalc(){const g=id=>{const e=document.getElementById(id);return e?num(e):NaN};
+  if(tf.m==='crem'){tf.n=g('tfN');tf.t=g('tfT');tf.l=g('tfL');$('#tfOut').textContent=fmt(tf.n*tf.t*tf.l)+' cm';}
+  else if(tf.m==='tuer'){tf.p=g('tfP');tf.nn=g('tfNN');const v=tf.p*tf.nn;$('#tfOut').textContent=fmt(v)+' mm/min';}
+  else if(tf.m==='biela'){tf.r=g('tfR');tf.L=g('tfLb');$('#tfRo').textContent=fmt(tf.r)+' cm';$('#tfLo').textContent=fmt(tf.L)+' cm';$('#tfOut').textContent=fmt(2*tf.r)+' cm';}
+  else if(tf.m==='yugo'){tf.r=g('tfR');$('#tfRo').textContent=fmt(tf.r)+' cm';$('#tfOut').textContent=fmt(2*tf.r)+' cm';}}
+$$('#tfMech button').forEach(b=>b.addEventListener('click',()=>{tf.m=b.dataset.m;tf.hist=[];$$('#tfMech button').forEach(x=>x.setAttribute('aria-pressed',x===b));tfBuild();}));
+tfBuild();
+function camR(phi){const s=tf.shape;phi=((phi%TAU)+TAU)%TAU;
+  if(s==='pera'){return 1+.75*Math.pow((1+Math.cos(phi))/2,4);}if(s==='car'){return .9+.7*(phi/TAU);}if(s==='dob'){return 1+.4*Math.pow(Math.cos(phi),2);}
+  return null;}
+scene('cvTrans',(ctx,w,h,dt,s)=>{tf.ph+=dt*1.6;const ph=tf.ph;
+  if(tf.m==='crem'){const z=14,m=Math.min(w/40,h/12);const r=m*z/2,cx=w/2,cy=h*.38;const a=1.6*Math.sin(ph*.8);const ang=Math.PI/2+a;
+    const ry=cy+r;const p=m*Math.PI;const shift=-a*r;
+    ctx.save();ctx.beginPath();ctx.rect(10,0,w-20,h);ctx.clip();ctx.beginPath();const rx0=cx-w,rx1=cx+w;
+    ctx.moveTo(rx0,ry+3*m);for(let k=-40;k<40;k++){const xc=cx+(k+.5)*p+shift;ctx.lineTo(xc-p*.5,ry+1.25*m);ctx.lineTo(xc-p*.28,ry+1.25*m);ctx.lineTo(xc-p*.13,ry-m);ctx.lineTo(xc+p*.13,ry-m);ctx.lineTo(xc+p*.28,ry+1.25*m);}
+    ctx.lineTo(rx1,ry+3*m);ctx.closePath();ctx.fillStyle=C.gb;ctx.fill();ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+    gear(ctx,cx,cy,z,m,ang,C.ga,false);const v=Math.cos(ph*.8);
+    if(Math.abs(v)>.15){arrow(ctx,cx,ry+3*m+22,cx-Math.sign(v)*60,ry+3*m+22,C.steel,3);spinArrow(ctx,cx,cy,r+m+10,Math.sign(v),C.signal);}
+    label(ctx,'piñón',cx+r+m+34,cy-r*.4,C.signal,11);label(ctx,'cremallera',cx+w*.3,ry+3*m+22,C.steel,11);}
+  else if(tf.m==='tuer'){const cy=h/2,x0=40,x1=w-40,rr=Math.min(26,h*.1);const travel=(x1-x0)*.32;const nx=w/2+travel*Math.sin(ph*.6);const pitch=18;const off=((nx-w/2)%pitch+pitch)%pitch;
+    ctx.fillStyle=C.gc;ctx.fillRect(x0,cy-rr,x1-x0,rr*2);ctx.save();ctx.beginPath();ctx.rect(x0,cy-rr,x1-x0,rr*2);ctx.clip();ctx.strokeStyle=C.ink;ctx.lineWidth=2;
+    for(let x=x0-pitch*3+off;x<x1+pitch;x+=pitch){ctx.beginPath();ctx.moveTo(x,cy+rr);ctx.lineTo(x+pitch*.6,cy-rr);ctx.stroke();}ctx.restore();ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.strokeRect(x0,cy-rr,x1-x0,rr*2);
+    ctx.fillStyle=C.ink;ctx.fillRect(x0-14,cy-rr*1.6,14,rr*3.2);ctx.fillStyle=C.ga;ctx.fillRect(nx-rr*1.3,cy-rr*1.8,rr*2.6,rr*3.6);ctx.strokeRect(nx-rr*1.3,cy-rr*1.8,rr*2.6,rr*3.6);label(ctx,'tuerca',nx,cy-rr*1.8-12,C.signal,11);
+    const v=Math.cos(ph*.6);if(Math.abs(v)>.15)arrow(ctx,nx,cy+rr*1.8+18,nx+Math.sign(v)*50,cy+rr*1.8+18,C.signal,3);
+    // indicador de giro del tornillo
+    ctx.save();ctx.translate(x0-30,cy);const ga=(nx-w/2)/pitch*TAU;ctx.strokeStyle=C.steel;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-rr*1.6*Math.cos(ga));ctx.stroke();ctx.restore();
+    label(ctx,'tornillo (gira, no avanza)',w/2,cy+rr+46,C.muted,11);}
+  else if(tf.m==='biela'||tf.m==='yugo'){const sc=Math.min(w/(2*5+14+8),h/(2*5+4));const r=tf.r*sc,cx=w*.08+5*sc,cy=h/2;const th=ph;const px=cx+r*Math.cos(th),py=cy+r*Math.sin(th);
+    ctx.beginPath();ctx.arc(cx,cy,5*sc*.95,0,TAU);ctx.fillStyle=C.gc;ctx.fill();ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.strokeStyle=C.signal;ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.stroke();ctx.lineCap='butt';ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(cx,cy,5,0,TAU);ctx.fill();
+    if(tf.m==='biela'){const L=tf.L*sc;const sx=cx+r*Math.cos(th)+Math.sqrt(Math.max(0,L*L-r*r*Math.sin(th)**2));const pw=Math.max(40,3*sc),ph2=Math.min(h*.36,4*sc);
+      ctx.fillStyle=C.paper;ctx.strokeStyle=C.muted;ctx.lineWidth=1.5;const gx0=cx+(tf.L-tf.r)*sc-pw*.6,gx1=cx+(tf.L+tf.r)*sc+pw*1.3;ctx.strokeRect(gx0,cy-ph2/2-4,gx1-gx0,ph2+8);
+      ctx.strokeStyle=C.ink;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(sx,cy);ctx.stroke();
+      ctx.fillStyle=C.gb;ctx.fillRect(sx,cy-ph2/2,pw,ph2);ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.strokeRect(sx,cy-ph2/2,pw,ph2);
+      [[px,py],[sx,cy]].forEach(([x,y])=>{ctx.fillStyle=C.panel;ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fill();ctx.stroke();});
+      label(ctx,'manivela',cx,cy+5*sc+14,C.signal,11);label(ctx,'biela',(px+sx)/2,Math.min(py,cy)-16,C.ink,11);label(ctx,'pistón (émbolo)',sx+pw/2,cy+ph2/2+16,C.steel,11);
+      const xa=cx+(tf.L-tf.r)*sc,xb=cx+(tf.L+tf.r)*sc,yc=cy-ph2/2-18;ctx.strokeStyle=C.steel;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(xa,yc);ctx.lineTo(xb,yc);ctx.moveTo(xa,yc-5);ctx.lineTo(xa,yc+5);ctx.moveTo(xb,yc-5);ctx.lineTo(xb,yc+5);ctx.stroke();label(ctx,'carrera '+fmt(2*tf.r)+' cm',(xa+xb)/2,yc-11,C.steel,11);}
+    else{const yx=px;const yh=2*5*sc;ctx.fillStyle=C.gb;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.fillRect(yx-7,cy-yh/2,14,yh);ctx.strokeRect(yx-7,cy-yh/2,14,yh);
+      ctx.fillStyle=C.paper;ctx.fillRect(yx-3,cy-yh/2+6,6,yh-12);ctx.strokeRect(yx-3,cy-yh/2+6,6,yh-12);
+      ctx.fillStyle=C.gb;ctx.fillRect(yx+7,cy-6,w*.42,12);ctx.strokeRect(yx+7,cy-6,w*.42,12);ctx.fillStyle=C.panel;ctx.beginPath();ctx.arc(px,py,6,0,TAU);ctx.fill();ctx.stroke();
+      ctx.strokeStyle=C.muted;ctx.setLineDash([4,4]);ctx.strokeRect(cx+5*sc+20,cy-14,w*.6,28);ctx.setLineDash([]);label(ctx,'yugo + vástago',yx+7+w*.21,cy+28,C.steel,11);}
+  }
+  else{ // leva
+    const R0=Math.min(h*.2,w*.12),cx=w*.27,cy=h*.62,th=ph;let pts=[];
+    if(tf.shape==='exc'){const e=.38,c=[e*Math.cos(th),e*Math.sin(th)];for(let k=0;k<120;k++){const a=k/120*TAU;pts.push([(c[0]+Math.cos(a))*R0,(c[1]+Math.sin(a))*R0]);}}
+    else{for(let k=0;k<240;k++){const a=k/240*TAU;const rr=camR(a)*R0;pts.push([rr*Math.cos(a+th),rr*Math.sin(a+th)]);}}
+    let top=Infinity;pts.forEach(p=>{if(Math.abs(p[0])<R0*.25)top=Math.min(top,p[1]);});if(!Number.isFinite(top))top=Math.min(...pts.map(p=>p[1]));
+    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(cx+p[0],cy+p[1]):ctx.moveTo(cx+p[0],cy+p[1]));ctx.closePath();ctx.fillStyle=C.ga;ctx.fill();ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(cx,cy,5,0,TAU);ctx.fill();spinArrow(ctx,cx,cy,R0*1.95,1,C.signal);
+    const fy=cy+top;const rr=10;ctx.fillStyle=C.panel;ctx.beginPath();ctx.arc(cx,fy-rr,rr,0,TAU);ctx.fill();ctx.stroke();
+    ctx.fillStyle=C.gb;ctx.fillRect(cx-6,fy-rr-R0*1.9,12,R0*1.9-rr);ctx.strokeRect(cx-6,fy-rr-R0*1.9,12,R0*1.9-rr);
+    ctx.strokeStyle=C.muted;ctx.lineWidth=2;const gy=fy-rr-R0*1.9+16;ctx.beginPath();ctx.moveTo(cx-18,cy-R0*2.6);ctx.lineTo(cx-10,cy-R0*2.6);ctx.moveTo(cx+10,cy-R0*2.6);ctx.lineTo(cx+18,cy-R0*2.6);ctx.stroke();
+    label(ctx,'seguidor',cx+44,fy-rr-R0,C.steel,11);label(ctx,'palpador',cx+40,fy-rr,C.ink,11);label(ctx,'leva',cx,cy+R0*1.95+16,C.signal,11);
+    // gráfica
+    if(dt>0){tf.hist.push(-top);if(tf.hist.length>260)tf.hist.shift();}
+    const gx0=w*.52,gx1=w-14,gy0=h*.18,gy1=h*.82;ctx.strokeStyle=C.line;ctx.lineWidth=1;for(let k=0;k<=4;k++){const y=gy0+(gy1-gy0)*k/4;ctx.beginPath();ctx.moveTo(gx0,y);ctx.lineTo(gx1,y);ctx.stroke();}
+    ctx.strokeStyle=C.ink;ctx.beginPath();ctx.moveTo(gx0,gy0);ctx.lineTo(gx0,gy1);ctx.lineTo(gx1,gy1);ctx.stroke();label(ctx,'altura del seguidor',gx0+4,gy0-12,C.muted,11,'left');label(ctx,'tiempo →',gx1,gy1+14,C.muted,11,'right');
+    const lo=R0*.55,hi=R0*1.85;ctx.strokeStyle=C.steel;ctx.lineWidth=2.5;ctx.beginPath();tf.hist.forEach((v,i)=>{const x=gx1-(tf.hist.length-1-i)*((gx1-gx0)/260);const y=gy1-(v-lo)/(hi-lo)*(gy1-gy0);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+    if(tf.hist.length){const v=tf.hist[tf.hist.length-1];ctx.fillStyle=C.steel;ctx.beginPath();ctx.arc(gx1,gy1-(v-lo)/(hi-lo)*(gy1-gy0),4,0,TAU);ctx.fill();}}
+});
+
+/* ======================= PRÁCTICA ======================= */
+const R=(a,b,step=1)=>a+step*Math.floor(Math.random()*((b-a)/step+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const GENS={
+  velocidad:()=>{const v=R(2,30),t=R(2,12);const d=v*t;return{t:'Velocidad lineal',q:`Un patinete recorre ${d} m en línea recta en ${t} s. ¿Cuál es su velocidad?`,u:'m/s',a:v,s:`v = d / t = ${d} / ${t} = ${fmt(v)} m/s`};},
+  rpm:()=>{const n=R(2,20),t=R(2,8);return{t:'Velocidad angular',q:`Una noria da ${n*t} vueltas en ${t} minutos. ¿Cuál es su velocidad angular?`,u:'rpm',a:n,s:`n = nº vueltas / t = ${n*t} / ${t} = ${fmt(n)} rpm`};},
+  palanca:()=>{const kind=pick(['P','R','bp']);const g=R(1,3);const br=R(1,8,1)/2,bp=R(1,8,1)/2;let R_=R(2,40)*10;const P=R_*br/bp;
+    const ctx_=['un balancín (1er grado)','una carretilla (2º grado)','unas pinzas (3er grado)'][g-1];
+    if(kind==='P')return{t:'Ley de la palanca',q:`En ${ctx_} la resistencia es de ${R_} N con un brazo de ${fmt(br)} m. El brazo de la potencia mide ${fmt(bp)} m. ¿Qué potencia equilibra la palanca?`,u:'N',a:P,s:`P · bp = R · br → P = R · br / bp = ${R_} · ${fmt(br)} / ${fmt(bp)} = ${fmt(P)} N`};
+    if(kind==='R')return{t:'Ley de la palanca',q:`Con ${ctx_} aplicamos una potencia de ${fmt(P)} N con un brazo de ${fmt(bp)} m. Si el brazo de la resistencia mide ${fmt(br)} m, ¿qué resistencia podemos equilibrar?`,u:'N',a:R_,s:`R = P · bp / br = ${fmt(P)} · ${fmt(bp)} / ${fmt(br)} = ${fmt(R_)} N`};
+    return{t:'Ley de la palanca',q:`Queremos levantar ${R_} N situados a ${fmt(br)} m del apoyo aplicando ${fmt(P)} N. ¿A qué distancia del apoyo hay que aplicar la potencia?`,u:'m',a:bp,s:`bp = R · br / P = ${R_} · ${fmt(br)} / ${fmt(P)} = ${fmt(bp)} m`};},
+  engranaje:()=>{const z1=R(8,60),z2=R(8,60),n1=R(2,30)*10;const n2=n1*z1/z2;return{t:'Engranajes',q:`La rueda motriz de un engranaje tiene ${z1} dientes y gira a ${n1} rpm. La conducida tiene ${z2} dientes. ¿A qué velocidad gira la conducida?`,u:'rpm',a:n2,s:`n₁ · Z₁ = n₂ · Z₂ → n₂ = ${n1} · ${z1} / ${z2} = ${fmt(n2)} rpm (i = ${fmt(z1/z2,3)}, ${z1>z2?'multiplicador':z1<z2?'reductor':'directo'})`};},
+  poleas:()=>{const d1=R(4,40),d2=R(4,40),n1=R(5,60)*10;const n2=n1*d1/d2;return{t:'Poleas',q:`Una polea motriz de ${d1} cm de diámetro gira a ${n1} rpm y mueve con una correa otra polea de ${d2} cm. ¿Velocidad de la polea conducida?`,u:'rpm',a:n2,s:`n₁ · D₁ = n₂ · D₂ → n₂ = ${n1} · ${d1} / ${d2} = ${fmt(n2)} rpm`};},
+  sinfin:()=>{const z=R(10,60),n1=R(5,30)*100;const n2=n1/z;return{t:'Tornillo sin fin',q:`Un motor gira a ${n1} rpm y mueve un tornillo sin fin que engrana con una corona de ${z} dientes. ¿A qué velocidad gira la corona?`,u:'rpm',a:n2,s:`n₁ · 1 = n₂ · Z₂ → n₂ = ${n1} / ${z} = ${fmt(n2)} rpm`};},
+  dientes:()=>{const z1=R(10,40),i=pick([.25,.4,.5,2,2.5,3,1.5]);const z2=z1/i;if(!Number.isInteger(z2))return GENS.dientes();return{t:'Diseño de un engranaje',q:`Se necesita un engranaje con relación de transmisión i = ${fmt(i)}. La rueda motriz tiene ${z1} dientes. ¿Cuántos dientes debe tener la conducida?`,u:'dientes',a:z2,s:`i = Z₁ / Z₂ → Z₂ = Z₁ / i = ${z1} / ${fmt(i)} = ${fmt(z2)} dientes`};},
+  trenSimple:()=>{const n=R(3,5);const zs=Array.from({length:n},()=>R(8,50));const n1=R(2,20)*5;const nl=n1*zs[0]/zs[n-1];return{t:'Tren simple',q:`Un tren de engranajes simple tiene ruedas de ${zs.join(' – ')} dientes. La primera gira a ${n1} rpm. ¿A qué velocidad gira la última?`,u:'rpm',a:nl,s:`En un tren simple solo cuentan la primera y la última: n = ${n1} · ${zs[0]} / ${zs[n-1]} = ${fmt(nl)} rpm. Con ${n} ruedas, la última gira en ${n%2?'el mismo sentido':'sentido contrario'} que la primera.`};},
+  trenComp:()=>{const k=R(2,3);const p=Array.from({length:k},()=>[R(8,20),R(20,60)]);if(Math.random()<.3)p.forEach(x=>x.reverse());const n1=pick([15,30,60,100,120,1800,3000]);let i=1;p.forEach(([a,b])=>i*=a/b);const nl=n1*i;
+    return{t:'Tren compuesto',q:`Un tren compuesto tiene las parejas ${p.map(([a,b])=>`${a}→${b}`).join(', ')} (motriz → conducida). La primera rueda gira a ${n1} rpm. ¿Velocidad de la última?`,u:'rpm',a:nl,s:`i = (${p.map(x=>x[0]).join('·')}) / (${p.map(x=>x[1]).join('·')}) = ${fmt(i,4)} → n = ${n1} · ${fmt(i,4)} = ${fmt(nl)} rpm`};},
+  trenInverso:()=>{const p=[[R(10,20),R(30,50)],[R(10,20),R(30,50)]];let i=1;p.forEach(([a,b])=>i*=a/b);const nl=pick([5,10,25,40,125]);const n1=nl/i;
+    return{t:'Tren compuesto (al revés)',q:`En un tren compuesto con parejas ${p.map(([a,b])=>`${a}→${b}`).join(', ')}, la última rueda gira a ${nl} rpm. ¿A qué velocidad gira la primera?`,u:'rpm',a:n1,s:`i = (${p[0][0]}·${p[1][0]}) / (${p[0][1]}·${p[1][1]}) = ${fmt(i,4)} → n₁ = n₄ / i = ${nl} / ${fmt(i,4)} = ${fmt(n1)} rpm`};},
+  cremallera:()=>{const n=R(5,40),t=R(1,5),l=R(2,10);return{t:'Piñón-cremallera',q:`Un piñón gira a ${n} rpm durante ${t} min. Cada vuelta del piñón hace avanzar la cremallera ${l} cm. ¿Cuánto se desplaza la cremallera?`,u:'cm',a:n*t*l,s:`Desplazamiento = n · t · l = ${n} · ${t} · ${l} = ${fmt(n*t*l)} cm`};},
+  tuerca:()=>{const p=pick([0.5,1,1.25,1.5,2,2.5,3]),n=R(2,30)*10;return{t:'Tornillo-tuerca',q:`Un tornillo con un paso de rosca de ${fmt(p)} mm gira a ${n} rpm. ¿A qué velocidad avanza la tuerca?`,u:'mm/min',a:p*n,s:`v = p · n = ${fmt(p)} · ${n} = ${fmt(p*n)} mm/min`};}
+};
+$$('.practice').forEach(box=>{const keys=box.dataset.gens.split(',');let cur=null,tries=0;
+  box.innerHTML=`<div class="lab-title">Generador de problemas</div><div class="stmt"></div><div class="answer"><label class="sr" style="font-weight:700">Respuesta</label><input type="text" inputmode="decimal" aria-label="Tu respuesta"><span class="mono unit muted"></span><button class="btn small primary chk" type="button">Comprobar</button><button class="btn small sol-btn" type="button">Ver solución</button><button class="btn small nx" type="button">Otro problema</button></div><div class="fb"></div><div class="sol" hidden></div>`;
+  const stmt=$('.stmt',box),inp=$('input',box),fb=$('.fb',box),sol=$('.sol',box),unit=$('.unit',box);
+  function next(){cur=GENS[pick(keys)]();tries=0;stmt.innerHTML=`<span class="tag" style="margin-bottom:6px">${cur.t}</span><div>${cur.q}</div>`;unit.textContent=cur.u;inp.value='';fb.innerHTML='';sol.hidden=true;sol.innerHTML=`<b>Solución</b><span class="mono">${cur.s}</span>`;}
+  function check(){const v=num(inp);if(!Number.isFinite(v)){fb.innerHTML='<span class="pill bad">Escribe un número (puedes usar coma decimal)</span>';return;}
+    const ok=Math.abs(v-cur.a)<=Math.max(.011,Math.abs(cur.a)*.01);tries++;
+    fb.innerHTML=ok?'<span class="pill ok">¡Correcto!</span>':`<span class="pill bad">No es correcto${tries>1?'. Revisa la fórmula o mira la solución':''}</span>`;if(ok)sol.hidden=false;}
+  $('.chk',box).addEventListener('click',check);inp.addEventListener('keydown',e=>{if(e.key==='Enter')check();});$('.sol-btn',box).addEventListener('click',()=>sol.hidden=false);$('.nx',box).addEventListener('click',next);next();});
+
+/* ======================= QUIZ ======================= */
+const QZ=[
+ ['Un mecanismo es…',['Un conjunto de elementos que aguantan cargas sin deformarse','Un conjunto de piezas que transmiten o transforman un movimiento','Una máquina que funciona con electricidad'],1,'Las estructuras aguantan cargas sin deformarse; los mecanismos permiten que unas piezas se muevan respecto a otras.'],
+ ['Un tiovivo da 12 vueltas cada 3 minutos. Su velocidad angular es…',['36 rpm','4 rpm','0,25 rpm'],1,'n = nº de vueltas / t = 12 / 3 = 4 rpm.'],
+ ['Un mecanismo cuya entrada es circular y la salida lineal es de…',['Transmisión lineal','Transmisión circular','Transformación'],2,'Si los movimientos de entrada y salida son distintos, el mecanismo es de transformación.'],
+ ['En una palanca de segundo grado, el elemento que queda en medio es…',['El punto de apoyo','La resistencia','La potencia'],1,'Como en una carretilla: la carga está entre la rueda (apoyo) y las manos (potencia).'],
+ ['Una resistencia de 200 N está a 0,5 m del apoyo y la potencia se aplica a 2 m. ¿Qué potencia equilibra la palanca?',['50 N','100 N','800 N'],0,'P = R · br / bp = 200 · 0,5 / 2 = 50 N.'],
+ ['Una palanca en equilibrio…',['Siempre está horizontal','Permanece quieta, aunque no esté horizontal','Se mueve hacia el lado de la potencia'],1,'Si P·bp = R·br la palanca no se mueve, en la posición en la que esté.'],
+ ['Un engranaje tiene una rueda motriz de 10 dientes y una conducida de 30. Es…',['Multiplicador, i = 3','Reductor, i = 1/3','Directo, i = 1'],1,'i = Z₁ / Z₂ = 10 / 30 = 0,33 < 1, así que es reductor.'],
+ ['¿Qué mecanismo mantiene el mismo sentido de giro en los dos ejes?',['Engranajes exteriores','Ruedas de fricción','Poleas con correa sin cruzar'],2,'Con la correa sin cruzar, las dos poleas giran en el mismo sentido. Engranajes exteriores y ruedas de fricción lo invierten.'],
+ ['Un tornillo sin fin engrana con una corona de 40 dientes. ¿Cuántas vueltas da el tornillo para que la corona dé una?',['1','4','40'],2,'Por cada vuelta del tornillo la corona avanza un diente: hacen falta tantas vueltas como dientes tiene la corona.'],
+ ['Tren simple de 10 – 15 – 20 dientes; la primera rueda gira a 8 rpm. La última gira a…',['4 rpm','16 rpm','12 rpm'],0,'En un tren simple, i = Z₁ / Z_última = 10 / 20 = 0,5 → n = 8 · 0,5 = 4 rpm. La rueda loca no influye.'],
+ ['Tren compuesto 10 – 20 – 10 – 20; la primera rueda gira a 15 rpm. La última gira a…',['7,5 rpm','3,75 rpm','60 rpm'],1,'i = (10·10)/(20·20) = 0,25 → n = 15 · 0,25 = 3,75 rpm.'],
+ ['¿Cuál de estos mecanismos NO es reversible?',['Piñón-cremallera','Biela-manivela','Leva-seguidor'],2,'La leva mueve al seguidor, pero empujar el seguidor no hace girar la leva. El tornillo sin fin tampoco es reversible.']];
+function renderQuiz(){$('#quiz').innerHTML=QZ.map(([q,opts],k)=>`<fieldset class="q" id="q${k}" style="margin:0"><legend class="qn">PREGUNTA ${k+1} DE ${QZ.length}</legend><div class="qt">${q}</div>${opts.map((o,j)=>`<label><input type="radio" name="qq${k}" id="qq${k}_${j}" value="${j}"> <span>${o}</span></label>`).join('')}<div class="exp" hidden></div></fieldset>`).join('');$('#quizScore').hidden=true;}
+renderQuiz();
+function showBest(){const b=store.get('mec_quiz_best',null);$('#quizBest').textContent=b!=null?`Tu mejor nota en este navegador: ${b} / ${QZ.length}`:'';}
+showBest();
+$('#quizCheck').addEventListener('click',()=>{let ok=0;QZ.forEach(([q,opts,a,exp],k)=>{const f=$('#q'+k);const sel=$(`input[name="qq${k}"]:checked`,f);f.classList.remove('right','wrong');const e=$('.exp',f);
+  if(sel&&+sel.value===a){ok++;f.classList.add('right');e.innerHTML='<b style="color:var(--ok)">Correcto.</b> '+exp;}else{f.classList.add('wrong');e.innerHTML=`<b style="color:var(--bad)">${sel?'Incorrecto':'Sin contestar'}.</b> La respuesta es «${opts[a]}». ${exp}`;}e.hidden=false;});
+  const sc=$('#quizScore');sc.hidden=false;sc.textContent=`${ok} / ${QZ.length} · nota ${fmt(ok/QZ.length*10,1)}`;sc.className='pill '+(ok/QZ.length>=.5?'ok':'bad');
+  const b=store.get('mec_quiz_best',null);if(b==null||ok>b)store.set('mec_quiz_best',ok);showBest();});
+$('#quizReset').addEventListener('click',renderQuiz);
+})();
+</script>
+</body></html>

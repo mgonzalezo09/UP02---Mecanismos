@@ -1126,8 +1126,9 @@ scene('cvTrain',(ctx,w,h,dt)=>{const md=trModel();const G=md.gears;
   const visW=TAU*10/60*(tr.n1>0?1:0);tr.a0+=visW*dt;const axA=[tr.a0];
   md.meshes.forEach(ms=>{const f=G[ms.f],t=G[ms.t];axA[t.axle]=meshAngle(axA[f.axle],f.z,t.z,ms.th);});
   const last=md.axles-1;
-  const order=G.map((g,k)=>k).sort((p,q)=>((G[p].plane||0)-(G[q].plane||0)));
-  order.forEach(k=>{const g=G[k];const fill=g.axle===0?C.ga:g.axle===last?C.gb:C.gc;ctx.globalAlpha=(tr.type==='comp'&&g.plane===0&&G.some(q=>q.axle===g.axle&&q.plane===1))?.6:1;
+  // primero las ruedas grandes y encima las pequeñas: en un eje compartido la pequeña nunca queda tapada
+  const order=G.map((g,k)=>k).sort((p,q)=>G[q].z-G[p].z);
+  order.forEach(k=>{const g=G[k];const fill=g.axle===0?C.ga:g.axle===last?C.gb:C.gc;ctx.globalAlpha=(tr.type==='comp'&&(G.some((q,j)=>j!==k&&q.axle===g.axle&&q.z<g.z)||(g.axle===last&&G.some((q,j)=>q.axle!==g.axle&&q.z>=g.z))))?.65:1;
     gear(ctx,ox+pos[k].x*m,oy+pos[k].y*m,g.z,m,axA[g.axle],fill);ctx.globalAlpha=1;});
   // flechas y velocidades por eje
   for(let ax=0;ax<md.axles;ax++){const ks=G.map((g,k)=>k).filter(k=>G[k].axle===ax);const k=ks[0];const rmax=Math.max(...ks.map(q=>G[q].z))/2;const cx=ox+pos[k].x*m,cy=oy+pos[k].y*m;
